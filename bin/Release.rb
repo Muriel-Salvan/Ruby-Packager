@@ -34,36 +34,44 @@ module RubyPackager
     end
 
     # Run the releaser
-    def run
-      # Parse command line arguments
-      lSuccess = true
+    #
+    # Parameters:
+    # * *iParameters* (<em>list<String></em>): List of arguments, as in command-line
+    # Return:
+    # * _Boolean_: Success ?
+    def run(iParameters)
+      rSuccess = true
+
       begin
-        lRemainingArgs = @OptionsParser.parse(ARGV)
+        # Parse command line arguments
+        lRemainingArgs = @OptionsParser.parse(iParameters)
         if (lRemainingArgs.size != 1)
           puts 'Wrong release file. Please specify 1 release file.'
           puts @OptionsParser
-          lSuccess = false
+          rSuccess = false
         else
           lReleaseFile = lRemainingArgs[0]
           require lReleaseFile
           if (!defined?($ReleaseInfo))
             puts "Release file #{lReleaseFile} is incorrect. It does not define $ReleaseInfo variable. Please correct it and try again."
-            lSuccess = false
+            rSuccess = false
           end
         end
       rescue Exception
         puts "Error while parsing arguments: #{$!}"
         puts @OptionsParser
-        lSuccess = false
+        rSuccess = false
       end
-      if (lSuccess)
-        lSuccess = Releaser.new.execute($ReleaseInfo, Dir.getwd, "#{Dir.getwd}/Releases", ReleaseInfo.new, @IncludeRuby)
-        if (lSuccess)
+      if (rSuccess)
+        rSuccess = Releaser.new.execute($ReleaseInfo, Dir.getwd, "#{Dir.getwd}/Releases", PlatformReleaser.new, @IncludeRuby)
+        if (rSuccess)
           puts 'Release successful.'
         else
           puts 'Error while releasing.'
         end
       end
+
+      return rSuccess
     end
 
   end
@@ -72,5 +80,10 @@ end
 
 # Execute everything
 if ($0 == __FILE__)
-  RubyPackager::Launcher.new.run
+  lSuccess = RubyPackager::Launcher.new.run(ARGV)
+  if (lSuccess)
+    exit 0
+  else
+    exit 1
+  end
 end

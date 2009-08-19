@@ -51,6 +51,10 @@ module RubyPackager
     #   String
     attr_reader :NSIFileName
 
+    # Is the application a terminal application ?
+    #   Boolean
+    attr_reader :TerminalApplication
+
     # Default constructor
     #
     # Paramters:
@@ -62,8 +66,9 @@ module RubyPackager
     # * *iExeName* (_String_): Name of the executable to produce
     # * *iIconName* (_String_): Name of the icon file (relative to the root dir)
     # * *iNSIFileName* (_String_): Name of the NSI installation file (relative to the root dir)
-    def initialize(iName, iVersion, iCoreFiles, iAdditionalFiles, iStartupRBFile, iExeName, iIconName, iNSIFileName)
-      @Name, @Version, @CoreFiles, @AdditionalFiles, @StartupRBFile, @ExeName, @IconName, @NSIFileName = iName, iVersion, iCoreFiles, iAdditionalFiles, iStartupRBFile, iExeName, iIconName, iNSIFileName
+    # * *iTerminalApplication* (_Boolean_): Is the application intended to run in a terminal ?
+    def initialize(iName, iVersion, iCoreFiles, iAdditionalFiles, iStartupRBFile, iExeName, iIconName, iNSIFileName, iTerminalApplication)
+      @Name, @Version, @CoreFiles, @AdditionalFiles, @StartupRBFile, @ExeName, @IconName, @NSIFileName, @TerminalApplication = iName, iVersion, iCoreFiles, iAdditionalFiles, iStartupRBFile, iExeName, iIconName, iNSIFileName, iTerminalApplication
     end
 
     # Check if the tools needed for the release are ok
@@ -165,7 +170,7 @@ module RubyPackager
           # Application core is copied
           # TODO (crate): When crate will work correctly under Windows, use it here to pack everything
           # For now the executable creation is platform dependent
-          rSuccess = iPlatformReleaseInfo.createBinary(iRootDir, lReleaseDir, iIncludeRuby, iReleaseInfo.StartupRBFile, iReleaseInfo.ExeName, iReleaseInfo.IconName)
+          rSuccess = iPlatformReleaseInfo.createBinary(iRootDir, lReleaseDir, iIncludeRuby, iReleaseInfo.StartupRBFile, iReleaseInfo.ExeName, iReleaseInfo.IconName, iReleaseInfo.TerminalApplication)
         end
         if (rSuccess)
           logOp('Copy additional files') do
@@ -191,68 +196,4 @@ module RubyPackager
 
   end
 
-  # Get command line parameters
-  #
-  # Return:
-  # * _OptionParser_: The options parser
-  def self.getOptions
-    rOptions = OptionParser.new
-
-    rOptions.banner = 'Release.rb [-r|--ruby] [-g|--rubygems] [-w|--wxruby] [-e|--ext]'
-    rOptions.on('-r', '--ruby',
-      'Include Ruby distribution in the release.') do
-      $PBS_Distribution_Ruby = true
-    end
-    rOptions.on('-g', '--rubygems',
-      'Include Ruby Gems in the release.') do
-      $PBS_Distribution_RubyGems = true
-    end
-    rOptions.on('-w', '--wxruby',
-      'Include WxRuby in the release.') do
-      $PBS_Distribution_WxRuby = true
-    end
-    rOptions.on('-e', '--ext',
-      'Include all ext directory in the release.') do
-      $PBS_Distribution_Ext = true
-    end
-
-    return rOptions
-  end
-
-  # Run Release
-  def self.run
-    # Default constants that are modified by command line options
-    $PBS_Distribution_Ruby = false
-    $PBS_Distribution_RubyGems = false
-    $PBS_Distribution_WxRuby = false
-    $PBS_Distribution_Ext = false
-    # Parse command line arguments
-    lOptions = self.getOptions
-    lSuccess = true
-    begin
-      lOptions.parse(ARGV)
-    rescue Exception
-      puts "Error while parsing arguments: #{$!}"
-      puts lOptions
-      lSuccess = false
-    end
-    if (lSuccess)
-      lSuccess = Releaser.new(Dir.getwd, "#{Dir.getwd}/Releases", PlatformReleaser.new).execute(
-        $PBS_Distribution_Ruby,
-        $PBS_Distribution_RubyGems,
-        $PBS_Distribution_WxRuby,
-        $PBS_Distribution_Ext)
-      if (lSuccess)
-        puts 'Release successful.'
-      else
-        puts 'Error while releasing.'
-      end
-    end
-  end
-
-end
-
-# Execute everything
-if ($0 == __FILE__)
-  PBS::Distribution::run
 end

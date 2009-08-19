@@ -12,6 +12,8 @@ module RubyPackager
 
   class PlatformReleaser
 
+    PLATFORM_DIR = File.dirname(__FILE__)
+
     # Check if the tools we will use are present
     #
     # Parameters:
@@ -31,9 +33,9 @@ module RubyPackager
         end
       end
       # Check that edicon is present
-      if (!File.exists?("#{iRootDir}/Distribution/#{RUBY_PLATFORM}/edicon/edicon.exe"))
-        puts "!!! Need to have edicon installed in #{iRootDir}/Distribution/#{RUBY_PLATFORM}/edicon to set a Windows executable's icon."
-        puts "!!! Please install edicon, part of Ocra Gem (gem install ocra), and copy from the Gem directory (ocra-1.1.1/share/ocra/edicon.exe) to #{iPBSRootDir}/Distribution/#{RUBY_PLATFORM}/edicon/edicon.exe."
+      if (!File.exists?("#{PLATFORM_DIR}/edicon/edicon.exe"))
+        puts "!!! Need to have edicon.exe installed in #{PLATFORM_DIR}/edicon to set a Windows executable's icon."
+        puts "!!! Please install edicon, part of Ocra Gem (gem install ocra), and copy from the Gem directory (ocra-1.1.1/share/ocra/edicon.exe) to #{PLATFORM_DIR}/edicon/edicon.exe."
         rSuccess = false
       end
       # Check that exerb is present
@@ -62,22 +64,38 @@ module RubyPackager
     # * *iMainRBFile* (_String_): Name of the main .rb file to call at startup
     # * *iExeName* (_String_): Name of the executable to produce
     # * *iIconName* (_String_): Name of the executable icon (relative to root dir)
+    # * *iTerminalApplication* (_Boolean_): Is the application intended to run in a terminal ?
     # Return:
     # * _Boolean_: Success ?
-    def createBinary(iRootDir, iReleaseDir, iIncludeRuby, iMainRBFile, iExeName, iIconName)
+    def createBinary(iRootDir, iReleaseDir, iIncludeRuby, iMainRBFile, iExeName, iIconName, iTerminalApplication)
       rSuccess = true
 
       lBinSubDir = "Launch/#{RUBY_PLATFORM}/bin"
-      lBinName = "rubyw-#{RUBY_VERSION}.exe"
+      lRubyBaseBinName = nil
+      lRubyLaunchCmd = nil
+      if (iTerminalApplication)
+        lRubyBaseBinName = 'ruby'
+        lRubyLaunchCmd = 'ruby'
+      else
+        lRubyBaseBinName = 'rubyw'
+        lRubyLaunchCmd = 'start rubyw'
+      end
+      lBinName = "#{lRubyBaseBinName}-#{RUBY_VERSION}.exe"
       if (iIncludeRuby)
         # First create the binary containing all ruby
         lBinDir = "#{iReleaseDir}/#{lBinSubDir}"
         FileUtils::mkdir_p(lBinDir)
         lOldDir = Dir.getwd
         Dir.chdir(lBinDir)
-        rSuccess = system("allinoneruby.bat --rubyw #{lBinName}")
+        lCmd = nil
+        if (iTerminalApplication)
+          lCmd = "allinoneruby.bat #{lBinName}"
+        else
+          lCmd = "allinoneruby.bat --rubyw #{lBinName}"
+        end
+        rSuccess = system(lCmd)
         if (!rSuccess)
-          puts "!!! Error while executing \"allinoneruby.bat --rubyw #{lBinName}\""
+          puts "!!! Error while executing \"#{lCmd}\""
         end
         Dir.chdir(lOldDir)
       end
@@ -122,10 +140,10 @@ end
 \# Test if Ruby is installed
 lSuccess = false
 lCurrentDir = Dir.getwd
-if (system('rubyw --version'))
+if (system('#{lRubyBaseBinName} --version'))
   \# Launch directly
   puts \"Ruby found in environment. Using it directly.\"
-  lSuccess = RubyPackager::shellExecute(\"start rubyw -w \\\"\#{lCurrentDir}/#{iMainRBFile}\\\" \#{ARGV.join(' ')}\")
+  lSuccess = RubyPackager::shellExecute(\"#{lRubyLaunchCmd} -w \\\"\#{lCurrentDir}/#{iMainRBFile}\\\" \#{ARGV.join(' ')}\")
 end
 if (!lSuccess)
   \# Use allinoneruby
@@ -146,9 +164,9 @@ end
         if (rSuccess)
           File.unlink(lTempFileName)
           # And set its icon
-          rSuccess = system("#{iRootDir}/Distribution/#{RUBY_PLATFORM}/edicon/edicon.exe #{iReleaseDir}/#{iExeName}.exe #{iRootDir}/#{iIconName}")
+          rSuccess = system("#{PLATFORM_DIR}/edicon/edicon.exe #{iReleaseDir}/#{iExeName}.exe #{iRootDir}/#{iIconName}")
           if (!rSuccess)
-            puts "!!! Error while executing \"#{iRootDir}/Distribution/#{RUBY_PLATFORM}/edicon/edicon.exe #{iReleaseDir}/#{iExeName}.exe #{iRootDir}/#{iIconName}\""
+            puts "!!! Error while executing \"#{PLATFORM_DIR}/edicon/edicon.exe #{iReleaseDir}/#{iExeName}.exe #{iRootDir}/#{iIconName}\""
           end
         else
           puts "!!! Error while executing \"exerb.bat -o #{iExeName}.exe #{lTempFileName}\""
