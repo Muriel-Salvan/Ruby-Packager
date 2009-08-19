@@ -155,11 +155,15 @@ module RubyPackager
       lReleaseDir += '/Release'
       logOp('Check installed tools') do
         # Check that the tools we need to release are indeed here
-        iReleaseInfo.checkTools(iRootDir)
-        # Check tools for platform dependent considerations
-        lPlatformSuccess = iPlatformReleaseInfo.checkTools(iRootDir, iIncludeRuby)
-        if (!lPlatformSuccess)
+        lAppSuccess = iReleaseInfo.checkTools(iRootDir)
+        if (!lAppSuccess)
           rSuccess = false
+        else
+          # Check tools for platform dependent considerations
+          lPlatformSuccess = iPlatformReleaseInfo.checkTools(iRootDir, iIncludeRuby)
+          if (!lPlatformSuccess)
+            rSuccess = false
+          end
         end
       end
       if (rSuccess)
