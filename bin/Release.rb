@@ -1,3 +1,4 @@
+#!env ruby
 #--
 # Copyright (c) 2009 Muriel Salvan (murielsalvan@users.sourceforge.net)
 # Licensed under the terms specified in LICENSE file. No warranty is provided.
@@ -78,8 +79,8 @@ module RubyPackager
 
 end
 
-# Execute everything
-if ($0 == __FILE__)
+# Execute everything (take care that paths might differ in bin directories gems)
+if (File.basename($0) == File.basename(__FILE__))
   lSuccess = RubyPackager::Launcher.new.run(ARGV)
   if (lSuccess)
     exit 0

@@ -1,0 +1,35 @@
+= Projects used by RubyPackager
+
+== AllInOneRuby
+* Erik Veenstra <allinoneruby@erikveen.dds.nl>
+* http://rubyforge.org/projects/allinoneruby/
+* Used to release Ruby for platforms missing Ruby
+
+== Exerb
+* Yuya Kato <yuyakato@gmail.com>
+* http://exerb.sourceforge.jp/index.en.html
+* Used to create the executable entry point of PBS
+
+== NSIS
+* kichik@users.sourceforge.net
+* http://nsis.sourceforge.net
+* Used to create the installer for Windows
+
+== Ocra
+* Lars Christensen
+* http://rubyforge.org/projects/ocra/
+* Used its edicon utility to change executable icon
+
+== Ruby
+* Yukihiro « matz » Matsumoto (http://www.rubyist.net/~matz/)
+* http://www.ruby-lang.org/
+* Used to develop PBS. Thanks a lot Matz for this truly wonderful language !
+
+== RubyGems
+* Paul Duncan <pabs@pablotron.org>
+* http://rubygems.org/
+* Used to automatically download Gem dependencies
+
+= People that helped a lot in developing RubyPackager
+
+* Jeremy Hinegardner <jeremy@hinegardner.org>, for his wonderful project Crate (http://copiousfreetime.rubyforge.org/crate/) that should be the next standard in shipping cross-platform ruby applications

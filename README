@@ -1,0 +1,18 @@
+-- This file is best viewed when processed by rdoc.
+++
+
+= RubyPackager
+
+Packaging your Ruby applications on any platform.
+
+== Where is the documentation ?
+
+Check the website at http://rubypackager.sourceforge.net
+
+== Who wrote it ?
+
+Check the AUTHORS[link:files/AUTHORS.html] file.
+
+== What is the license ?
+
+You can find out in the LICENSE[link:files/LICENSE.html] file.
