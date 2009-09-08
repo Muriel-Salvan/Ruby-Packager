@@ -106,7 +106,7 @@ module RubyPackager
     # * *iFilesPatterns* (<em>list<String></em>): The list of files patterns
     def copyFiles(iRootDir, iReleaseDir, iFilesPatterns)
       iFilesPatterns.each do |iFilePattern|
-        Dir.glob(iFilePattern).each do |iFileName|
+        Dir.glob(File.expand_path(iFilePattern)).each do |iFileName|
           if (iFileName.match(/\.svn/) == nil)
             lRelativeName = nil
             # Extract the relative file name
