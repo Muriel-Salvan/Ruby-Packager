@@ -8,7 +8,7 @@
 == Exerb
 * Yuya Kato <yuyakato@gmail.com>
 * http://exerb.sourceforge.jp/index.en.html
-* Used to create the executable entry point of PBS
+* Used to create the executable entry point
 
 == NSIS
 * kichik@users.sourceforge.net
@@ -23,7 +23,7 @@
 == Ruby
 * Yukihiro « matz » Matsumoto (http://www.rubyist.net/~matz/)
 * http://www.ruby-lang.org/
-* Used to develop PBS. Thanks a lot Matz for this truly wonderful language !
+* Used to develop RubyPackager. Thanks a lot Matz for this truly wonderful language !
 
 == RubyGems
 * Paul Duncan <pabs@pablotron.org>

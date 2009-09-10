@@ -5,10 +5,10 @@
 
 ; install.nsi
 ;
-; This script creates an installer using NSIS for PBS on Windows.
+; This script creates an installer using NSIS for a simple test program
 ; The compiler must define the following symbols:
 ; * VERSION (/DVERSION=0.0.1.20090430)
-; * RELEASEDIR ("/DRELEASEDIR=C:\PBS\Releases\MyRelease")
+; * RELEASEDIR ("/DRELEASEDIR=C:\Releases\MyRelease")
 
 ;--------------------------------
 ; Global attributes
