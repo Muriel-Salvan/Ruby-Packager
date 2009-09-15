@@ -12,8 +12,8 @@ lRootDir = File.expand_path("#{File.dirname(__FILE__)}/..")
 $LOAD_PATH << lRootDir
 $LOAD_PATH << "#{lRootDir}/lib"
 
-require 'bin/Release.rb'
-require 'Common.rb'
+require 'bin/Release'
+require 'Common'
 
 # Run the test cases for our platform
-require "#{File.dirname(__FILE__)}/#{RUBY_PLATFORM}/run.rb"
+require "#{File.dirname(__FILE__)}/#{RUBY_PLATFORM}/run"

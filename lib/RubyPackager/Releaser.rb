@@ -12,7 +12,7 @@ require 'fileutils'
 require 'optparse'
 
 # Require the platform specific distribution file
-require "RubyPackager/#{RUBY_PLATFORM}/PlatformReleaser.rb"
+require "RubyPackager/#{RUBY_PLATFORM}/PlatformReleaser"
 
 module RubyPackager
 

@@ -9,7 +9,7 @@
 # * A binary, including some core Ruby and program files (eventually the whole Ruby distribution if needed - that is if the program is meant to be run on platforms not providing Ruby)
 # * A list of files/directories
 
-require 'RubyPackager/Releaser.rb'
+require 'RubyPackager/Releaser'
 
 module RubyPackager
 
