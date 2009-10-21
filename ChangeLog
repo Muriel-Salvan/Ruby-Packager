@@ -1,5 +1,17 @@
 = RubyPackager Release History
 
+== 0.1.0.20091021 (Alpha)
+
+* Implemented release of libraries as well.
+* Implemented generation of Installers.
+* Implemented distribution to third parties (SourceForge...).
+* Harmonized the way ReleaseInfo are described (!!! complete change with no compatibility with previous format).
+* Plugins architecture for Installers and Distributors.
+* Removed .rb suffixes in required files (better migration to .so if needed).
+* Removed references to PBS.
+* Bug correction: Dir.glob does not work correctly with '\'.
+* Bug correction: Application specific checks for tools were ignored.
+
 == 0.0.1.20090819 (Alpha)
 
 * Initial public release.

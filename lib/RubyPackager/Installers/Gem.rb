@@ -30,6 +30,8 @@ module RubyPackager
       def createInstaller(iRootDir, iReleaseDir, iInstallerDir, iVersion, iReleaseInfo)
         rFileName = nil
 
+        lOldDir = Dir.getwd
+        Dir.chdir(iReleaseDir)
         # 1. Generate the gemspec that will build the gem
         lStrHasRDoc = nil
         if (iReleaseInfo.GemInfo[:HasRDoc])
@@ -37,12 +39,12 @@ module RubyPackager
         else
           lStrHasRDoc = 'false'
         end
-        lFilesFilter = "#{iReleaseDir}/**/*"
-        lStrFiles = "iSpec.files = [ '#{Dir.glob(lFilesFilter).join('\', \'')}' ]"
+        # !!! Don't use absolute paths here, otherwise they will be stored in the Gem
+        lStrFiles = "iSpec.files = [ '#{Dir.glob('**/*').join('\', \'')}' ]"
         lStrExtraRDocFiles = ''
         if ((iReleaseInfo.GemInfo[:ExtraRDocFiles] != nil) and
             (!iReleaseInfo.GemInfo[:ExtraRDocFiles].empty?))
-          lStrExtraRDocFiles = "iSpec.extra_rdoc_files = [ '#{@Description[:ExtraRDocFiles].join('\', \'')}' ]"
+          lStrExtraRDocFiles = "iSpec.extra_rdoc_files = [ '#{iReleaseInfo.GemInfo[:ExtraRDocFiles].join('\', \'')}' ]"
           RubyPackager::copyFiles(iRootDir, iReleaseDir, iReleaseInfo.GemInfo[:ExtraRDocFiles])
         end
         lGemDepsStrList = []
@@ -64,7 +66,7 @@ module RubyPackager
         lStrDefaultExecutable = ''
         if (iReleaseInfo.ExecutableInfo[:StartupRBFile] != nil)
           lStrBinDir = "iSpec.bindir = '#{File.dirname(iReleaseInfo.ExecutableInfo[:StartupRBFile])}'"
-          lStrDefaultExecutable = "iSpec.default_executable = '#{File.basename(iReleaseInfo.ExecutableInfo[:StartupRBFile])}'"
+          lStrDefaultExecutable = "iSpec.executables = [ '#{File.basename(iReleaseInfo.ExecutableInfo[:StartupRBFile])}' ]"
         end
         lGemSpecFileName = 'release.gemspec.rb'
         File.open(lGemSpecFileName, 'w') do |oFile|
@@ -111,6 +113,7 @@ end
           rFileName = "#{iReleaseInfo.GemInfo[:GemName]}-#{iVersion}.gem"
           FileUtils::mv(rFileName, "#{iInstallerDir}/#{rFileName}")
         end
+        Dir.chdir(lOldDir)
 
         return rFileName
       end

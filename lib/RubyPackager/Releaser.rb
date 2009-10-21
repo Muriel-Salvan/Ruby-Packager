@@ -97,7 +97,7 @@ module RubyPackager
             (!@ReleaseInfo.checkReadyForRelease(@RootDir)))
           rSuccess = false
         end
-        if (@ReleaseInfo.ExecutableInfo[:StartupRBFile] != nil)
+        if (@ReleaseInfo.ExecutableInfo[:ExeName] != nil)
           # Check tools for platform dependent considerations
           if (!@PlatformReleaseInfo.checkExeTools(@RootDir, @IncludeRuby))
             rSuccess = false
@@ -211,7 +211,7 @@ module RubyPackager
 "
         end
       end
-      if (@ReleaseInfo.ExecutableInfo[:StartupRBFile] != nil)
+      if (@ReleaseInfo.ExecutableInfo[:ExeName] != nil)
         logOp('Create binary') do
           # TODO (crate): When crate will work correctly under Windows, use it here to pack everything
           # For now the executable creation is platform dependent
@@ -242,6 +242,7 @@ module RubyPackager
         :Name => @ReleaseInfo.ProjectInfo[:Name],
         :Version => @ReleaseVersion,
         :Tags => @ReleaseTags,
+        :Date => Time.now,
         :DevStatus => @ReleaseInfo.ProjectInfo[:DevStatus],
         :Author => @ReleaseInfo.AuthorInfo[:Name],
         :AuthorMail => @ReleaseInfo.AuthorInfo[:EMail],
@@ -252,7 +253,8 @@ module RubyPackager
         :DownloadURL => "https://sourceforge.net/projects/#{@ReleaseInfo.SFInfo[:ProjectUnixName]}/files/#{@ReleaseVersion}/#{@GemName}/download",
         :SVNBrowseURL => @ReleaseInfo.ProjectInfo[:SVNBrowseURL],
         :FaviconURL => @ReleaseInfo.ProjectInfo[:FaviconURL],
-        :RootDir => @RootDir
+        # For the documentation, the Root dir is the Release dir as files have been copied there and the rdoc will be generated from there.
+        :RootDir => @ReleaseDir
       }
       gem 'rdoc'
       require 'rdoc/rdoc'
