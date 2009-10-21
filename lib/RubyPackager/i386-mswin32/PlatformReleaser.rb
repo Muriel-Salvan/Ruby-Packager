@@ -14,14 +14,14 @@ module RubyPackager
 
     PLATFORM_DIR = File.dirname(__FILE__)
 
-    # Check if the tools we will use are present
+    # Check if the tools we will use to generate an executable are present
     #
     # Parameters:
     # * *iRootDir* (_String_): Root directory
     # * *iIncludeRuby* (_Boolean_): Do we include Ruby in the release ?
     # Return:
     # * _Boolean_: Are tools correctly useable ?
-    def checkTools(iRootDir, iIncludeRuby)
+    def checkExeTools(iRootDir, iIncludeRuby)
       rSuccess = true
 
       if (iIncludeRuby)
@@ -44,12 +44,6 @@ module RubyPackager
         puts "!!! Please download and install exerb from http://exerb.sourceforge.jp/index.en.html"
         rSuccess = false
       end
-      # Check that makensis is present
-      if (!system('makensis /VERSION'))
-        puts "!!! Need to have MakeNSIS installed in the system PATH to create installer."
-        puts "!!! Please download and install MakeNSIS in the PATH from http://nsis.sourceforge.net/Main_Page"
-        rSuccess = false
-      end
 
       return rSuccess
     end
@@ -61,19 +55,16 @@ module RubyPackager
     # * *iRootDir* (_String_): Root directory
     # * *iReleaseDir* (_String_): Release directory
     # * *iIncludeRuby* (_Boolean_): Do we include Ruby in the release ?
-    # * *iMainRBFile* (_String_): Name of the main .rb file to call at startup
-    # * *iExeName* (_String_): Name of the executable to produce
-    # * *iIconName* (_String_): Name of the executable icon (relative to root dir)
-    # * *iTerminalApplication* (_Boolean_): Is the application intended to run in a terminal ?
+    # * *iReleaseInfo* (_ReleaseInfo_): The release information
     # Return:
     # * _Boolean_: Success ?
-    def createBinary(iRootDir, iReleaseDir, iIncludeRuby, iMainRBFile, iExeName, iIconName, iTerminalApplication)
+    def createBinary(iRootDir, iReleaseDir, iIncludeRuby, iReleaseInfo)
       rSuccess = true
 
       lBinSubDir = "Launch/#{RUBY_PLATFORM}/bin"
       lRubyBaseBinName = nil
       lRubyLaunchCmd = nil
-      if (iTerminalApplication)
+      if (iReleaseInfo.ExecutableInfo[:TerminalApplication])
         lRubyBaseBinName = 'ruby'
         lRubyLaunchCmd = 'ruby'
       else
@@ -88,7 +79,7 @@ module RubyPackager
         lOldDir = Dir.getwd
         Dir.chdir(lBinDir)
         lCmd = nil
-        if (iTerminalApplication)
+        if (iReleaseInfo.ExecutableInfo[:TerminalApplication])
           lCmd = "allinoneruby.bat #{lBinName}"
         else
           lCmd = "allinoneruby.bat --rubyw #{lBinName}"
@@ -143,12 +134,12 @@ lCurrentDir = Dir.getwd
 if (system('#{lRubyBaseBinName} --version'))
   \# Launch directly
   puts \"Ruby found in environment. Using it directly.\"
-  lSuccess = RubyPackager::shellExecute(\"#{lRubyLaunchCmd} -w \\\"\#{lCurrentDir}/#{iMainRBFile}\\\" \#{ARGV.join(' ')}\")
+  lSuccess = RubyPackager::shellExecute(\"#{lRubyLaunchCmd} -w \\\"\#{lCurrentDir}/#{iReleaseInfo.ExecutableInfo[:StartupRBFile]}\\\" \#{ARGV.join(' ')}\")
 end
 if (!lSuccess)
   \# Use allinoneruby
   puts \"Ruby not found in environment. Using shipped Ruby.\"
-  lSuccess = RubyPackager::shellExecute(\"start \\\"Title\\\" \\\"\#{lCurrentDir}/#{lBinSubDir}/#{lBinName}\\\" \\\"\#{lCurrentDir}/#{iMainRBFile}\\\" \#{ARGV.join(' ')}\")
+  lSuccess = RubyPackager::shellExecute(\"start \\\"Title\\\" \\\"\#{lCurrentDir}/#{lBinSubDir}/#{lBinName}\\\" \\\"\#{lCurrentDir}/#{iReleaseInfo.ExecutableInfo[:StartupRBFile]}\\\" \#{ARGV.join(' ')}\")
   if (!lSuccess)
     puts 'Unable to execute the application. Please reinstall it.'
     puts 'Hit enter to quit.'
@@ -159,39 +150,19 @@ end
         end
         lOldDir = Dir.getwd
         Dir.chdir(iReleaseDir)
-        rSuccess = system("exerb.bat -o #{iExeName}.exe #{lTempFileName}")
+        rSuccess = system("exerb.bat -o #{iReleaseInfo.ExecutableInfo[:ExeName]}.exe #{lTempFileName}")
         Dir.chdir(lOldDir)
         if (rSuccess)
           File.unlink(lTempFileName)
           # And set its icon
-          rSuccess = system("#{PLATFORM_DIR}/edicon/edicon.exe #{iReleaseDir}/#{iExeName}.exe #{iRootDir}/#{iIconName}")
+          lEdiconCmd = "#{PLATFORM_DIR}/edicon/edicon.exe #{iReleaseDir}/#{iReleaseInfo.ExecutableInfo[:ExeName]}.exe #{iRootDir}/#{iReleaseInfo.ExecutableInfo[:IconName]}"
+          rSuccess = system(lEdiconCmd)
           if (!rSuccess)
-            puts "!!! Error while executing \"#{PLATFORM_DIR}/edicon/edicon.exe #{iReleaseDir}/#{iExeName}.exe #{iRootDir}/#{iIconName}\""
+            puts "!!! Error while executing \"#{lEdiconCmd}\""
           end
         else
-          puts "!!! Error while executing \"exerb.bat -o #{iExeName}.exe #{lTempFileName}\""
+          puts "!!! Error while executing \"exerb.bat -o #{iReleaseInfo.ExecutableInfo[:ExeName]}.exe #{lTempFileName}\""
         end
-      end
-
-      return rSuccess
-    end
-
-    # Create the installer with everything in the release directory.
-    #
-    # Parameters:
-    # * *iRootDir* (_String_): The Root directory
-    # * *iReleaseDir* (_String_): The release directory (all files to put in the installer are there)
-    # * *iInstallerDir* (_String_): The directory where the installer has to be put
-    # * *iVersion* (_String_): Release version
-    # * *iNSIFileName* (_String_): Name of the NSI file
-    # Return:
-    # * _Boolean_: Success ?
-    def createInstaller(iRootDir, iReleaseDir, iInstallerDir, iVersion, iNSIFileName, iExeName)
-      rSuccess = system("makensis /DVERSION=#{iVersion} \"/DRELEASEDIR=#{iReleaseDir.gsub(/\//,'\\')}\" \"#{iRootDir.gsub(/\//,'\\')}\\#{iNSIFileName.gsub(/\//,'\\')}\"")
-
-      if (rSuccess)
-        lInstallerDir = File.dirname("#{iRootDir}/#{iNSIFileName}")
-        FileUtils.mv("#{lInstallerDir}/setup.exe", "#{iInstallerDir}/#{iExeName}_#{iVersion}_setup.exe")
       end
 
       return rSuccess

@@ -4,35 +4,17 @@
 # Licensed under the terms specified in LICENSE file. No warranty is provided.
 #++
 
-# Release a distribution of a Ruby program.
-# This produces an installable executable that will install a set of files and directories:
-# * A binary, including some core Ruby and program files (eventually the whole Ruby distribution if needed - that is if the program is meant to be run on platforms not providing Ruby)
-# * A list of files/directories
-
-require 'RubyPackager/Releaser'
+# Release a distribution of a Ruby program or library.
+# Here is the behaviour:
+# 1. Gather all files meant to be released in a separate directory (Core, Additional and Test if specified)
+# 2. In the case of an executable release, generate the executable with Core files and Ruby distribution if specified
+# 3. In the case of specified installers, generate the needed installers including the Core files (or the executable), the Additional files and Test if specified)
+# 4. In the case of specified distributors, ship the generated installers to those distributors
 
 module RubyPackager
 
   # Class giving command line options for the releaser
   class Launcher
-
-    # The options parser
-    #   OptionsParser
-    attr_reader :OptionsParser
-
-    # Constructor
-    def initialize
-      # Variables set by the parser
-      @IncludeRuby = false
-
-      # The parser
-      @OptionsParser = OptionParser.new
-      @OptionsParser.banner = 'Release.rb [-r|--ruby] <ReleaseFile>'
-      @OptionsParser.on('-r', '--ruby',
-        'Include Ruby distribution in the release.') do
-        @IncludeRuby = true
-      end
-    end
 
     # Run the releaser
     #
@@ -43,32 +25,131 @@ module RubyPackager
     def run(iParameters)
       rSuccess = true
 
+      # Parse for plugins
+      require 'rUtilAnts/Plugins'
+      lPluginsManager = RUtilAnts::Plugins::PluginsManager.new
+      lPluginsManager.parsePluginsFromDir('Installers', "#{File.dirname(__FILE__)}/../lib/RubyPackager/Installers", 'RubyPackager::Installers')
+      lPluginsManager.parsePluginsFromDir('Installers', "#{File.dirname(__FILE__)}/../lib/RubyPackager/#{RUBY_PLATFORM}/Installers", 'RubyPackager::Installers')
+      lPluginsManager.parsePluginsFromDir('Distributors', "#{File.dirname(__FILE__)}/../lib/RubyPackager/Distributors", 'RubyPackager::Distributors')
+      lPluginsManager.parsePluginsFromDir('Distributors', "#{File.dirname(__FILE__)}/../lib/RubyPackager/#{RUBY_PLATFORM}/Distributors", 'RubyPackager::Distributors')
+
+      # Parse command line arguments
+      # Variables set by the parser
+      lDisplayUsage = false
+      lReleaseVersion = 'UnnamedVersion'
+      lReleaseTags = []
+      lReleaseComment = nil
+      lIncludeRuby = false
+      lIncludeTest = false
+      lInstallers = []
+      lDistributors = []
+      # The parser
+      require 'optparse'
+      lOptionsParser = OptionParser.new
+      lOptionsParser.banner = 'Release.rb [-h|--help] [-v|--version <Version>] [-t|--tag <TagName>]* [-c|--comment <Comment>] [-r|--ruby] [-n|--includeTest] [-i|--installer <InstallerName>]* [-d|--distributor <DistributorName>]* <ReleaseFile>'
+      lOptionsParser.on('-h', '--help',
+        'Display help usage.') do
+        lDisplayUsage = true
+      end
+      lOptionsParser.on('-v', '--version <Version>', String,
+        '<Version>: Version string of the release.',
+        'Set the version to display for this release.') do |iArg|
+        lReleaseVersion = iArg
+      end
+      lOptionsParser.on('-t', '--tag <TagName>', String,
+        '<TagName>: Tag to apply to this version.',
+        'Set a Tag to this version. A Tag is a way to categorize the version (i.e. UltimateEdition, Alpha...).') do |iArg|
+        lReleaseTags << iArg
+      end
+      lOptionsParser.on('-c', '--comment <Comment>', String,
+        '<Comment>: Comment to add to the release note.',
+        'Set the release comment to display for this release.') do |iArg|
+        lReleaseComment = iArg
+      end
+      lOptionsParser.on('-r', '--ruby',
+        'Include Ruby distribution in the release (only applicable for executable releases).') do
+        lIncludeRuby = true
+      end
+      lOptionsParser.on('-n', '--includeTest',
+        'Include Test files in the release.') do
+        lIncludeTest = true
+      end
+      lOptionsParser.on('-i', '--installer <InstallerName>', String,
+        '<InstallerName>: Name of an Installer to use.',
+        "Generate an installer. Can be specified multiple times. Available Installers are: #{lPluginsManager.getPluginNames('Installers').join(', ')}") do |iArg|
+        lInstallers << iArg
+      end
+      lOptionsParser.on('-d', '--distributor <DistributorName>', String,
+        '<DistributorName>: Name of a Distributor to use.',
+        "Ship generated installers to a distributor. Can be specified multiple times. Available Distributors are: #{lPluginsManager.getPluginNames('Distributors').join(', ')}") do |iArg|
+        lDistributors << iArg
+      end
       begin
-        # Parse command line arguments
-        lRemainingArgs = @OptionsParser.parse(iParameters)
+        lRemainingArgs = lOptionsParser.parse(iParameters)
         if (lRemainingArgs.size != 1)
           puts 'Wrong release file. Please specify 1 release file.'
-          puts @OptionsParser
+          puts lOptionsParser
           rSuccess = false
         else
+          # Check the Release file
           lReleaseFile = lRemainingArgs[0]
+          require 'RubyPackager/ReleaseInfo'
           require lReleaseFile
           if (!defined?($ReleaseInfo))
             puts "Release file #{lReleaseFile} is incorrect. It does not define $ReleaseInfo variable. Please correct it and try again."
             rSuccess = false
           end
+          # Check the installers
+          lAvailableInstallers = lPluginsManager.getPluginNames('Installers')
+          lInstallers.each do |iInstallerName|
+            if (!lAvailableInstallers.include?(iInstallerName))
+              puts "Unknown specified installer: #{iInstallerName}."
+              puts lOptionsParser
+              rSuccess = false
+            end
+          end
+          # Check the distributors
+          lAvailableDistributors = lPluginsManager.getPluginNames('Distributors')
+          lDistributors.each do |iDistributorName|
+            if (!lAvailableDistributors.include?(iDistributorName))
+              puts "Unknown specified distributor: #{iDistributorName}."
+              puts lOptionsParser
+              rSuccess = false
+            end
+          end
         end
       rescue Exception
         puts "Error while parsing arguments: #{$!}"
-        puts @OptionsParser
+        puts lOptionsParser
         rSuccess = false
       end
       if (rSuccess)
-        rSuccess = Releaser.new.execute($ReleaseInfo, Dir.getwd, "#{Dir.getwd}/Releases", PlatformReleaser.new, @IncludeRuby)
-        if (rSuccess)
-          puts 'Release successful.'
+        if (lDisplayUsage)
+          puts lOptionsParser
         else
-          puts 'Error while releasing.'
+          # All is ok, call the library with parameters
+          require 'RubyPackager/Releaser'
+          # Require the platform specific distribution file
+          require "RubyPackager/#{RUBY_PLATFORM}/PlatformReleaser"
+          rSuccess = Releaser.new(
+            lPluginsManager,
+            $ReleaseInfo,
+            Dir.getwd,
+            "#{Dir.getwd}/Releases",
+            PlatformReleaser.new,
+            lReleaseVersion,
+            lReleaseTags,
+            lReleaseComment,
+            lIncludeRuby,
+            lIncludeTest,
+            lInstallers,
+            lDistributors
+          ).execute
+          if (rSuccess)
+            puts 'Release successful.'
+          else
+            puts 'Error while releasing.'
+          end
         end
       end
 
