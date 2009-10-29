@@ -3,7 +3,7 @@
 # Licensed under the terms specified in LICENSE file. No warranty is provided.
 #++
 
-$ReleaseInfo = RubyPackager::ReleaseInfo.new.
+RubyPackager::ReleaseInfo.new.
   author(
     :Name => 'Muriel Salvan',
     :EMail => 'murielsalvan@users.sourceforge.net',

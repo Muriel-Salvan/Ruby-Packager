@@ -11,9 +11,11 @@ require 'test/unit'
 lRootDir = File.expand_path("#{File.dirname(__FILE__)}/..")
 $LOAD_PATH << lRootDir
 $LOAD_PATH << "#{lRootDir}/lib"
+$LOAD_PATH << "#{lRootDir}/test"
 
 require 'bin/Release'
 require 'Common'
 
 # Run the test cases for our platform
+require "#{File.dirname(__FILE__)}/PlatformIndependent/run"
 require "#{File.dirname(__FILE__)}/#{RUBY_PLATFORM}/run"

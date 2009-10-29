@@ -287,26 +287,19 @@ module RubyPackager
 
       puts "==== Generating release note in HTML format ..."
       lLastChangesLines = []
-      File.open("#{@RootDir}/ChangeLog", 'r') do |iFile|
-        lInLastVersionSection = false
-        iFile.readlines.each do |iLine|
-          if (iLine.match(/^== /) != nil)
-            if (lInLastVersionSection)
-              # Nothing else to parse
-              break
-            else
-              # We are beginning the section corresponding to the last version
-              lInLastVersionSection = true
-            end
-          elsif (lInLastVersionSection)
-            # This line belongs to the last version section
-            lLastChangesLines << iLine.
-              gsub(/\n/,"<br/>\n").
-              gsub(/^=== (.*)$/, '<h3>\1</h3>').
-              gsub(/^\* (.*)$/, '<li>\1</li>').
-              gsub(/Bug correction/, '<span class="Bug">Bug correction</span>')
-          end
-        end
+      getLastChangeLog.each do |iLine|
+        lLastChangesLines << iLine.
+          gsub(/\n/,"<br/>\n").
+          gsub(/^=== (.*)$/, '<h3>\1</h3>').
+          gsub(/^\* (.*)$/, '<li>\1</li>').
+          gsub(/Bug correction/, '<span class="Bug">Bug correction</span>')
+      end
+      lStrWhatsNew = ''
+      if (@ReleaseComment != nil)
+        lStrWhatsNew = "
+<h2>What's new in this release</h2>
+#{@ReleaseComment.gsub(/\n/,"<br/>\n")}
+        "
       end
       File.open("#{@DocDir}/ReleaseNote.html", 'w') do |oFile|
         oFile << "
@@ -365,8 +358,7 @@ module RubyPackager
     <a href=\"#{@ReleaseInfo.ProjectInfo[:WebPageURL]}\"><img src=\"#{@ReleaseInfo.ProjectInfo[:ImageURL]}\" align=\"right\" width=\"100px\"/></a>
     <h1>Release Note for #{@ReleaseInfo.ProjectInfo[:Name]} - v. #{@ReleaseVersion}</h1>
     <h2>Development status: <span class=\"Important\">#{@ReleaseInfo.ProjectInfo[:DevStatus]}</span></h2>
-    <h2>What's new in this release</h2>
-#{@ReleaseComment.gsub(/\n/,"<br/>\n")}
+#{lStrWhatsNew}
     <h2>Detailed changes with previous version</h2>
 #{lLastChangesLines.join}
     <h2>Useful links</h2>
@@ -395,23 +387,14 @@ module RubyPackager
       rSuccess = true
 
       puts "==== Generating release note in TXT format ..."
-      lLastChangesLines = []
-      File.open("#{@RootDir}/ChangeLog", 'r') do |iFile|
-        lInLastVersionSection = false
-        iFile.readlines.each do |iLine|
-          if (iLine.match(/^== /) != nil)
-            if (lInLastVersionSection)
-              # Nothing else to parse
-              break
-            else
-              # We are beginning the section corresponding to the last version
-              lInLastVersionSection = true
-            end
-          elsif (lInLastVersionSection)
-            # This line belongs to the last version section
-            lLastChangesLines << iLine
-          end
-        end
+      lStrWhatsNew = ''
+      if (@ReleaseComment != nil)
+        lStrWhatsNew = "
+== What's new in this release
+
+#{@ReleaseComment}
+
+"
       end
       File.open("#{@DocDir}/ReleaseNote.txt", 'w') do |oFile|
         oFile << "
@@ -419,13 +402,10 @@ module RubyPackager
 
 == Development status: #{@ReleaseInfo.ProjectInfo[:DevStatus]}
 
-== What's new in this release
-
-#{@ReleaseComment}
-
+#{lStrWhatsNew}
 == Detailed changes with previous version
 
-#{lLastChangesLines.join}
+#{getLastChangeLog.join}
 
 ==  Useful links
 
@@ -440,6 +420,37 @@ module RubyPackager
       end
 
       return rSuccess
+    end
+
+    # Get the last change log
+    #
+    # Return:
+    # * <em>list<String></em>: The change log lines
+    def getLastChangeLog
+      rLastChangesLines = []
+
+      lChangeLogFileName = "#{@RootDir}/ChangeLog"
+      if (File.exists?(lChangeLogFileName))
+        File.open(lChangeLogFileName, 'r') do |iFile|
+          lInLastVersionSection = false
+          iFile.readlines.each do |iLine|
+            if (iLine.match(/^== /) != nil)
+              if (lInLastVersionSection)
+                # Nothing else to parse
+                break
+              else
+                # We are beginning the section corresponding to the last version
+                lInLastVersionSection = true
+              end
+            elsif (lInLastVersionSection)
+              # This line belongs to the last version section
+              rLastChangesLines << iLine
+            end
+          end
+        end
+      end
+
+      return rLastChangesLines
     end
 
   end

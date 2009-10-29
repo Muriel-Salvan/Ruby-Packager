@@ -84,38 +84,43 @@ module RubyPackager
         "Ship generated installers to a distributor. Can be specified multiple times. Available Distributors are: #{lPluginsManager.getPluginNames('Distributors').join(', ')}") do |iArg|
         lDistributors << iArg
       end
+      lReleaseInfo = nil
       begin
         lRemainingArgs = lOptionsParser.parse(iParameters)
         if (lRemainingArgs.size != 1)
-          puts 'Wrong release file. Please specify 1 release file.'
-          puts lOptionsParser
-          rSuccess = false
+          if (!lDisplayUsage)
+            puts 'Wrong release file. Please specify 1 release file.'
+            puts lOptionsParser
+            rSuccess = false
+          end
         else
           # Check the Release file
           lReleaseFile = lRemainingArgs[0]
           require 'RubyPackager/ReleaseInfo'
-          require lReleaseFile
-          if (!defined?($ReleaseInfo))
-            puts "Release file #{lReleaseFile} is incorrect. It does not define $ReleaseInfo variable. Please correct it and try again."
+          File.open(lReleaseFile, 'r') do |iFile|
+            lReleaseInfo = eval(iFile.read)
+          end
+          if (!lReleaseInfo.kind_of?(RubyPackager::ReleaseInfo))
+            puts "Release file #{lReleaseFile} is incorrect. It does not define RubyPackager::ReleaseInfo variable. Please correct it and try again."
             rSuccess = false
           end
-          # Check the installers
-          lAvailableInstallers = lPluginsManager.getPluginNames('Installers')
-          lInstallers.each do |iInstallerName|
-            if (!lAvailableInstallers.include?(iInstallerName))
-              puts "Unknown specified installer: #{iInstallerName}."
-              puts lOptionsParser
-              rSuccess = false
-            end
+        end
+        # Check the installers
+        lAvailableInstallers = lPluginsManager.getPluginNames('Installers')
+        lInstallers.each do |iInstallerName|
+          if (!lAvailableInstallers.include?(iInstallerName))
+            puts "Unknown specified installer: #{iInstallerName}."
+            puts lOptionsParser
+            rSuccess = false
           end
-          # Check the distributors
-          lAvailableDistributors = lPluginsManager.getPluginNames('Distributors')
-          lDistributors.each do |iDistributorName|
-            if (!lAvailableDistributors.include?(iDistributorName))
-              puts "Unknown specified distributor: #{iDistributorName}."
-              puts lOptionsParser
-              rSuccess = false
-            end
+        end
+        # Check the distributors
+        lAvailableDistributors = lPluginsManager.getPluginNames('Distributors')
+        lDistributors.each do |iDistributorName|
+          if (!lAvailableDistributors.include?(iDistributorName))
+            puts "Unknown specified distributor: #{iDistributorName}."
+            puts lOptionsParser
+            rSuccess = false
           end
         end
       rescue Exception
@@ -133,7 +138,7 @@ module RubyPackager
           require "RubyPackager/#{RUBY_PLATFORM}/PlatformReleaser"
           rSuccess = Releaser.new(
             lPluginsManager,
-            $ReleaseInfo,
+            lReleaseInfo,
             Dir.getwd,
             "#{Dir.getwd}/Releases",
             PlatformReleaser.new,

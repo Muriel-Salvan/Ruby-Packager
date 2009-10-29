@@ -3,15 +3,4 @@
 # Licensed under the terms specified in LICENSE file. No warranty is provided.
 #++
 
-module RubyPackager
-
-  module Test
-
-    module I386MSWin32
-
-
-    end
-
-  end
-
-end
+puts "Hello World"

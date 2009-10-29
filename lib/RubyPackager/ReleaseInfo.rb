@@ -48,17 +48,6 @@ module RubyPackager
     #   list< String >
     attr_reader :TestFiles
 
-    # Check if the tools needed for the release are ok
-    # This is meant to be overriden if needed
-    #
-    # Parameters:
-    # * *iRootDir* (_String_): Root directory from where the release is happening
-    # Return:
-    # * _Boolean_: Success ?
-    def checkTools(iRootDir)
-      return true
-    end
-    
     # Constructor
     def initialize
       # This sets also default values
