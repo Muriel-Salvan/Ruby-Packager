@@ -1,0 +1,45 @@
+diff -r rdoc-2.4.3_ORG/lib/rdoc/markup/to_html.rb rdoc-2.4.3/lib/rdoc/markup/to_html.rb
+29c29
+<     @markup.add_special(/((link:|https?:|mailto:|ftp:|www\.)\S+\w)/, :HYPERLINK)
+---
+>     @markup.add_special(/((link:|https?:|mailto:|ftps?:|www\.)\S+\w)/, :HYPERLINK)
+204c204,211
+<     @res << wrap(convert_flow(am.flow(fragment.txt)))
+---
+>     # Special treatment for Parameters: and Return:
+>     if ((fragment.txt == 'Return:') or
+>         (fragment.txt == 'Parameters:'))
+>       # Little title
+>       @res << "<div class=\"MethodSection\">#{wrap(convert_flow(am.flow(fragment.txt)))}</div>"
+>     else
+>       @res << wrap(convert_flow(am.flow(fragment.txt)))
+>     end
+309a317
+>
+336c344,351
+<       gsub(/\(r\)/, '&#174;')
+---
+>       gsub(/\(r\)/, '&#174;').
+>
+>     # convert <
+>       gsub(/</, '&lt;').
+>
+>     # convert >
+>       gsub(/>/, '&gt;')
+>
+
+
+
+diff -r rdoc-2.4.3_ORG/lib/rdoc/markup.rb rdoc-2.4.3/lib/rdoc/markup.rb
+168a169,173
+>       # Replace ** with indented *
+>       while (text.index('**') != nil)
+>         text.gsub!(/\*\*/, '  *')
+>       end
+>
+
+
+
+diff -r rdoc-2.4.3_ORG/lib/rdoc/rdoc.rb rdoc-2.4.3/lib/rdoc/rdoc.rb
+373a374
+> require 'rdoc/generator/muriel'

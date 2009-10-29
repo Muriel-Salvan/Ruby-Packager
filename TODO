@@ -9,3 +9,4 @@
 * Development
 ** Make it run under Linux
 ** Make it run under MacOS
+** Make rdoc modifications part of a real Gem or an RDoc improvement.

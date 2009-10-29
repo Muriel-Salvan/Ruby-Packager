@@ -17,9 +17,17 @@ module RubyPackager
         def testBasicLib
           execTest('Libraries/Basic', [], 'ReleaseInfo.rb') do |iReleaseDir, iReleaseInfo|
             assert(File.exists?("#{iReleaseDir}/Release/MainLib.rb"))
+            assert(File.exists?("#{iReleaseDir}/Release/ReleaseInfo"))
             assert(File.exists?("#{iReleaseDir}/Documentation/rdoc/index.html"))
             assert(File.exists?("#{iReleaseDir}/Documentation/ReleaseNote.html"))
             assert(File.exists?("#{iReleaseDir}/Documentation/ReleaseNote.txt"))
+            lReleasedInfo = nil
+            File.open("#{iReleaseDir}/Release/ReleaseInfo", 'r') do |iFile|
+              lReleasedInfo = eval(iFile.read)
+            end
+            assert(lReleasedInfo.kind_of?(Hash))
+            assert_equal('UnnamedVersion', lReleasedInfo[:Version])
+            assert_equal('Project:DevStatus', lReleasedInfo[:DevStatus])
           end
         end
 

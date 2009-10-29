@@ -265,7 +265,7 @@ module RubyPackager
         '--tab-width=2',
         "--title=#{@ReleaseInfo.ProjectInfo[:Name].gsub(/'/,'\\\\\'')} v#{@ReleaseVersion}",
         '--fileboxes',
-        '--fmt=darkfish',
+        '--fmt=muriel',
         '--exclude=.svn',
         '--exclude=nbproject',
         '--exclude=Done.txt',
