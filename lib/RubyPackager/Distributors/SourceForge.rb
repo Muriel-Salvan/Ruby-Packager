@@ -23,17 +23,17 @@ module RubyPackager
         begin
           require 'net/ssh'
         rescue Exception
-          puts '!!! Missing net/ssh library. gem install net-ssh.'
+          logErr 'Missing net/ssh library. gem install net-ssh.'
           rSuccess = false
         end
         begin
           require 'net/scp'
         rescue Exception
-          puts '!!! Missing net/scp library. gem install net-scp.'
+          logErr 'Missing net/scp library. gem install net-scp.'
           rSuccess = false
         end
         if (!system('zip -v'))
-          puts '!!! Missing zip command-line utility.'
+          logErr 'Missing zip command-line utility.'
           rSuccess = false
         end
 
@@ -91,7 +91,7 @@ module RubyPackager
 
       # Upload the RDoc on SF.NET
       def uploadRDocOnSFNET
-        puts 'Uploading RDoc on SF.NET ...'
+        logDebug 'Uploading RDoc on SF.NET ...'
         # Zip the RDoc
         lOldDir = Dir.getwd
         Dir.chdir(@DocDir)
@@ -122,7 +122,7 @@ module RubyPackager
 
       # Create the release on SF.NET
       def createReleaseOnSFNET
-        puts 'Creating Release on SF.NET ...'
+        logDebug 'Creating Release on SF.NET ...'
         sshWithPassword(
           'shell.sourceforge.net',
           @SFLogin,
@@ -133,7 +133,7 @@ module RubyPackager
       # Upload the generated files on SF.NET
       def uploadFilesOnSFNET
         @GeneratedFileNames.each do |iFileName|
-          puts "Uploading #{iFileName} on SF.NET ..."
+          logDebug "Uploading #{iFileName} on SF.NET ..."
           scpWithPassword(
             'shell.sourceforge.net',
             @SFLogin,
@@ -145,14 +145,14 @@ module RubyPackager
 
       # Upload the Release note on SF.NET
       def uploadReleaseNoteOnSFNET
-        puts 'Uploading Release Note on SF.NET ...'
+        logDebug 'Uploading Release Note on SF.NET ...'
         scpWithPassword(
           'shell.sourceforge.net',
           @SFLogin,
           "#{@DocDir}/ReleaseNote.html",
           "#{@SFReleaseDir}/ReleaseNote.html"
         )
-        puts '!!! DON\'T FORGET to make association between ReleaseNote and Gem in SF.NET'
+        logInfo '!!! DON\'T FORGET to make association between ReleaseNote and Gem in SF.NET'
       end
 
     end

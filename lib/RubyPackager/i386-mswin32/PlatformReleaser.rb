@@ -27,21 +27,18 @@ module RubyPackager
       if (iIncludeRuby)
         # We need allinoneruby
         if (Gem.find_files('allinoneruby').empty?)
-          puts "!!! Need to have allinoneruby gem to release including Ruby."
-          puts "!!! Please install allinoneruby gem (gem install allinoneruby)."
+          logErr "Need to have allinoneruby gem to release including Ruby.\nPlease install allinoneruby gem (gem install allinoneruby)."
           rSuccess = false
         end
       end
       # Check that edicon is present
       if (!File.exists?("#{PLATFORM_DIR}/edicon/edicon.exe"))
-        puts "!!! Need to have edicon.exe installed in #{PLATFORM_DIR}/edicon to set a Windows executable's icon."
-        puts "!!! Please install edicon, part of Ocra Gem (gem install ocra), and copy from the Gem directory (ocra-1.1.1/share/ocra/edicon.exe) to #{PLATFORM_DIR}/edicon/edicon.exe."
+        logErr "Need to have edicon.exe installed in #{PLATFORM_DIR}/edicon to set a Windows executable's icon.\nPlease install edicon, part of Ocra Gem (gem install ocra), and copy from the Gem directory (ocra-1.1.1/share/ocra/edicon.exe) to #{PLATFORM_DIR}/edicon/edicon.exe."
         rSuccess = false
       end
       # Check that exerb is present
       if (!system('exerb.bat --version'))
-        puts "!!! Need to have exerb installed in the system PATH to create a Windows executable."
-        puts "!!! Please download and install exerb from http://exerb.sourceforge.jp/index.en.html"
+        logErr "Need to have exerb installed in the system PATH to create a Windows executable.\nPlease download and install exerb from http://exerb.sourceforge.jp/index.en.html"
         rSuccess = false
       end
 
@@ -86,7 +83,7 @@ module RubyPackager
         end
         rSuccess = system(lCmd)
         if (!rSuccess)
-          puts "!!! Error while executing \"#{lCmd}\""
+          logErr "Error while executing \"#{lCmd}\""
         end
         Dir.chdir(lOldDir)
       end
@@ -158,10 +155,10 @@ end
           lEdiconCmd = "#{PLATFORM_DIR}/edicon/edicon.exe #{iReleaseDir}/#{iReleaseInfo.ExecutableInfo[:ExeName]}.exe #{iRootDir}/#{iReleaseInfo.ExecutableInfo[:IconName]}"
           rSuccess = system(lEdiconCmd)
           if (!rSuccess)
-            puts "!!! Error while executing \"#{lEdiconCmd}\""
+            logErr "Error while executing \"#{lEdiconCmd}\""
           end
         else
-          puts "!!! Error while executing \"exerb.bat -o #{iReleaseInfo.ExecutableInfo[:ExeName]}.exe #{lTempFileName}\""
+          logErr "Error while executing \"exerb.bat -o #{iReleaseInfo.ExecutableInfo[:ExeName]}.exe #{lTempFileName}\""
         end
       end
 

@@ -34,9 +34,9 @@ module RubyPackager
           lDestFileName = "#{iReleaseDir}/#{lRelativeName}"
           FileUtils::mkdir_p(File.dirname(lDestFileName))
           if (File.directory?(iFileName))
-            puts "Create directory #{lRelativeName}"
+            logDebug "Create directory #{lRelativeName}"
           else
-            puts "Copy file #{lRelativeName}"
+            logDebug "Copy file #{lRelativeName}"
             FileUtils::cp(iFileName, lDestFileName)
           end
         end
@@ -184,9 +184,9 @@ module RubyPackager
     # * *iOperationName* (_String_): Operation name
     # * *CodeBlock*: Code to call in this operation
     def logOp(iOperationName)
-      puts "===== #{iOperationName} ..."
+      logDebug "===== #{iOperationName} ..."
       yield
-      puts "===== ... #{iOperationName}"
+      logDebug "===== ... #{iOperationName}"
     end
 
     # Release files in a directory, and create the executable if needed
@@ -245,49 +245,50 @@ module RubyPackager
     def generateRDoc
       rSuccess = true
 
-      puts "==== Generating RDoc ..."
-      $ProjectInfo = {
-        :Name => @ReleaseInfo.ProjectInfo[:Name],
-        :Version => @ReleaseVersion,
-        :Tags => @ReleaseTags,
-        :Date => Time.now,
-        :DevStatus => @ReleaseInfo.ProjectInfo[:DevStatus],
-        :Author => @ReleaseInfo.AuthorInfo[:Name],
-        :AuthorMail => @ReleaseInfo.AuthorInfo[:EMail],
-        :AuthorURL => @ReleaseInfo.AuthorInfo[:WebPageURL],
-        :HomepageURL => @ReleaseInfo.ProjectInfo[:WebPageURL],
-        :ImageURL => @ReleaseInfo.ProjectInfo[:ImageURL],
-        # TODO: Do not hardcode SF anymore
-        :DownloadURL => "https://sourceforge.net/projects/#{@ReleaseInfo.SFInfo[:ProjectUnixName]}/files/#{@ReleaseVersion}/#{@GemName}/download",
-        :SVNBrowseURL => @ReleaseInfo.ProjectInfo[:SVNBrowseURL],
-        :FaviconURL => @ReleaseInfo.ProjectInfo[:FaviconURL],
-        # For the documentation, the Root dir is the Release dir as files have been copied there and the rdoc will be generated from there.
-        :RootDir => @ReleaseDir
-      }
-      gem 'rdoc'
-      require 'rdoc/rdoc'
-      lRDocOptions = [
-        '--line-numbers',
-        '--tab-width=2',
-        "--title=#{@ReleaseInfo.ProjectInfo[:Name].gsub(/'/,'\\\\\'')} v#{@ReleaseVersion}",
-        '--fileboxes',
-        '--exclude=.svn',
-        '--exclude=nbproject',
-        '--exclude=Done.txt',
-        "--exclude=Releases",
-        "--output=#{@DocDir}/rdoc"
-      ]
-      # Bug (RDoc): Sometimes it does not change current directory correctly (not deterministic)
-      lOldDir = Dir.getwd
-      Dir.chdir(@ReleaseDir)
-      # First try with Muriel's template
-      begin
-        RDoc::RDoc.new.document( lRDocOptions + [ '--fmt=muriel' ] )
-      rescue Exception
-        # Then try with default template
-        RDoc::RDoc.new.document( lRDocOptions )
+      logOp('Generating RDoc') do
+        $ProjectInfo = {
+          :Name => @ReleaseInfo.ProjectInfo[:Name],
+          :Version => @ReleaseVersion,
+          :Tags => @ReleaseTags,
+          :Date => Time.now,
+          :DevStatus => @ReleaseInfo.ProjectInfo[:DevStatus],
+          :Author => @ReleaseInfo.AuthorInfo[:Name],
+          :AuthorMail => @ReleaseInfo.AuthorInfo[:EMail],
+          :AuthorURL => @ReleaseInfo.AuthorInfo[:WebPageURL],
+          :HomepageURL => @ReleaseInfo.ProjectInfo[:WebPageURL],
+          :ImageURL => @ReleaseInfo.ProjectInfo[:ImageURL],
+          # TODO: Do not hardcode SF anymore
+          :DownloadURL => "https://sourceforge.net/projects/#{@ReleaseInfo.SFInfo[:ProjectUnixName]}/files/#{@ReleaseVersion}/#{@GemName}/download",
+          :SVNBrowseURL => @ReleaseInfo.ProjectInfo[:SVNBrowseURL],
+          :FaviconURL => @ReleaseInfo.ProjectInfo[:FaviconURL],
+          # For the documentation, the Root dir is the Release dir as files have been copied there and the rdoc will be generated from there.
+          :RootDir => @ReleaseDir
+        }
+        gem 'rdoc'
+        require 'rdoc/rdoc'
+        lRDocOptions = [
+          '--line-numbers',
+          '--tab-width=2',
+          "--title=#{@ReleaseInfo.ProjectInfo[:Name].gsub(/'/,'\\\\\'')} v#{@ReleaseVersion}",
+          '--fileboxes',
+          '--exclude=.svn',
+          '--exclude=nbproject',
+          '--exclude=Done.txt',
+          "--exclude=Releases",
+          "--output=#{@DocDir}/rdoc"
+        ]
+        # Bug (RDoc): Sometimes it does not change current directory correctly (not deterministic)
+        lOldDir = Dir.getwd
+        Dir.chdir(@ReleaseDir)
+        # First try with Muriel's template
+        begin
+          RDoc::RDoc.new.document( lRDocOptions + [ '--fmt=muriel' ] )
+        rescue Exception
+          # Then try with default template
+          RDoc::RDoc.new.document( lRDocOptions )
+        end
+        Dir.chdir(lOldDir)
       end
-      Dir.chdir(lOldDir)
 
       return rSuccess
     end
@@ -299,24 +300,24 @@ module RubyPackager
     def generateReleaseNote_HTML
       rSuccess = true
 
-      puts "==== Generating release note in HTML format ..."
-      lLastChangesLines = []
-      getLastChangeLog.each do |iLine|
-        lLastChangesLines << iLine.
-          gsub(/\n/,"<br/>\n").
-          gsub(/^=== (.*)$/, '<h3>\1</h3>').
-          gsub(/^\* (.*)$/, '<li>\1</li>').
-          gsub(/Bug correction/, '<span class="Bug">Bug correction</span>')
-      end
-      lStrWhatsNew = ''
-      if (@ReleaseComment != nil)
-        lStrWhatsNew = "
+      logOp('Generating release note in HTML format') do
+        lLastChangesLines = []
+        getLastChangeLog.each do |iLine|
+          lLastChangesLines << iLine.
+            gsub(/\n/,"<br/>\n").
+            gsub(/^=== (.*)$/, '<h3>\1</h3>').
+            gsub(/^\* (.*)$/, '<li>\1</li>').
+            gsub(/Bug correction/, '<span class="Bug">Bug correction</span>')
+        end
+        lStrWhatsNew = ''
+        if (@ReleaseComment != nil)
+          lStrWhatsNew = "
 <h2>What's new in this release</h2>
 #{@ReleaseComment.gsub(/\n/,"<br/>\n")}
-        "
-      end
-      File.open("#{@DocDir}/ReleaseNote.html", 'w') do |oFile|
-        oFile << "
+          "
+        end
+        File.open("#{@DocDir}/ReleaseNote.html", 'w') do |oFile|
+          oFile << "
 <html>
   <head>
     <link rel=\"shortcut icon\" href=\"#{@ReleaseInfo.ProjectInfo[:FaviconURL]}%>\" />
@@ -388,6 +389,7 @@ module RubyPackager
   </body>
 </html>
 "
+        end
       end
 
       return rSuccess
@@ -400,18 +402,18 @@ module RubyPackager
     def generateReleaseNote_TXT
       rSuccess = true
 
-      puts "==== Generating release note in TXT format ..."
-      lStrWhatsNew = ''
-      if (@ReleaseComment != nil)
-        lStrWhatsNew = "
+      logOp('Generating release note in TXT format') do
+        lStrWhatsNew = ''
+        if (@ReleaseComment != nil)
+          lStrWhatsNew = "
 == What's new in this release
 
 #{@ReleaseComment}
 
 "
-      end
-      File.open("#{@DocDir}/ReleaseNote.txt", 'w') do |oFile|
-        oFile << "
+        end
+        File.open("#{@DocDir}/ReleaseNote.txt", 'w') do |oFile|
+          oFile << "
 = Release Note for #{@ReleaseInfo.ProjectInfo[:Name]} - v. #{@ReleaseVersion}
 
 == Development status: #{@ReleaseInfo.ProjectInfo[:DevStatus]}
@@ -431,6 +433,7 @@ module RubyPackager
 * View complete ChangeLog: #{@ReleaseInfo.ProjectInfo[:SVNBrowseURL]}ChangeLog?view=markup
 * View README file: #{@ReleaseInfo.ProjectInfo[:SVNBrowseURL]}README?view=markup
 "
+        end
       end
 
       return rSuccess

@@ -11,6 +11,9 @@
 # 3. In the case of specified installers, generate the needed installers including the Core files (or the executable), the Additional files and Test if specified)
 # 4. In the case of specified distributors, ship the generated installers to those distributors
 
+require 'rUtilAnts/Logging'
+RUtilAnts::Logging::initializeLogging("#{File.dirname(__FILE__)}/..", 'http://sourceforge.net/tracker/?group_id=274236&atid=1165400')
+
 module RubyPackager
 
   # Class giving command line options for the releaser
@@ -26,6 +29,19 @@ module RubyPackager
     # * _Boolean_: Success ?
     def run(iParameters)
       rSuccess = true
+
+      # Get the RubyPackager version we are running on
+      lRPReleaseInfo = {
+        :Version => 'Development',
+        :Tags => [],
+        :DevStatus => 'Unofficial'
+      }
+      lReleaseInfoFileName = "#{File.dirname(FILE_PATH)}/ReleaseInfo"
+      if (File.exists?(lReleaseInfoFileName))
+        File.open(lReleaseInfoFileName, 'r') do |iFile|
+          lRPReleaseInfo = eval(iFile.read)
+        end
+      end
 
       # Parse for plugins
       require 'rUtilAnts/Plugins'
@@ -49,10 +65,14 @@ module RubyPackager
       # The parser
       require 'optparse'
       lOptionsParser = OptionParser.new
-      lOptionsParser.banner = 'Release.rb [-h|--help] [-v|--version <Version>] [-t|--tag <TagName>]* [-c|--comment <Comment>] [-r|--ruby] [-n|--includeTest] [-i|--installer <InstallerName>]* [-d|--distributor <DistributorName>]* <ReleaseFile>'
+      lOptionsParser.banner = 'Release.rb [-h|--help] [-e|--debug] [-v|--version <Version>] [-t|--tag <TagName>]* [-c|--comment <Comment>] [-r|--ruby] [-n|--includeTest] [-o|--no-rdoc] [-i|--installer <InstallerName>]* [-d|--distributor <DistributorName>]* <ReleaseFile>'
       lOptionsParser.on('-h', '--help',
         'Display help usage.') do
         lDisplayUsage = true
+      end
+      lOptionsParser.on('-e', '--debug',
+        'Activate debugging logs.') do
+        activateLogDebug(true)
       end
       lOptionsParser.on('-v', '--version <Version>', String,
         '<Version>: Version string of the release.',
@@ -137,6 +157,8 @@ module RubyPackager
       end
       if (rSuccess)
         if (lDisplayUsage)
+          puts "RubyPackager v. #{lRPReleaseInfo[:Version]} - #{lRPReleaseInfo[:DevStatus]}"
+          puts ''
           puts lOptionsParser
         else
           # All is ok, call the library with parameters
@@ -159,9 +181,9 @@ module RubyPackager
             lDistributors
           ).execute
           if (rSuccess)
-            puts 'Release successful.'
+            logInfo 'Release successful.'
           else
-            puts 'Error while releasing.'
+            logErr 'Error while releasing.'
           end
         end
       end

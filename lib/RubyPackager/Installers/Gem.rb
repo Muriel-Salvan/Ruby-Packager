@@ -94,7 +94,7 @@ end
         rescue ::Gem::SystemExitException
           # For RubyGems, this is normal behaviour: success results in an exception thrown with exit_code 0.
           if ($!.exit_code != 0)
-            puts "!!! RubyGems returned error #{$!.exit_code}."
+            logErr "RubyGems returned error #{$!.exit_code}."
             lGemOK = false
           end
         end

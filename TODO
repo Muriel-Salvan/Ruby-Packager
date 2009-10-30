@@ -6,6 +6,7 @@
 * Testing
 ** Test that each possible option from ReleaseInfo is used correctly in every context (Installers, Distributors...)
 ** Test checkTools on ReleaseInfo, Installers and Distributors
+** Test including Ruby in exe, and test that it effectively works
 
 * Development
 ** Make it run under Linux

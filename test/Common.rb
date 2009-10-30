@@ -7,6 +7,8 @@ require 'fileutils'
 # Require rUtilAnts and RubyPackager now because we will redefine methods and classes in them.
 require 'rUtilAnts/Plugins'
 require 'RubyPackager/Tools'
+# Change the Logging initialization to mute everything
+RUtilAnts::Logging::initializeLogging(File.dirname(__FILE__), 'http://sourceforge.net/tracker/?group_id=274236&atid=1165400', true)
 
 # Bypass the creation of any PluginsManager to include our dummy plugins automatically
 module RUtilAnts

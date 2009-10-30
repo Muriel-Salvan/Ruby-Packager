@@ -18,8 +18,7 @@ module RubyPackager
 
         # Check that makensis is present
         if (!system('makensis /VERSION'))
-          puts "!!! Need to have MakeNSIS installed in the system PATH to create installer."
-          puts "!!! Please download and install MakeNSIS in the PATH from http://nsis.sourceforge.net/Main_Page"
+          logErr "Need to have MakeNSIS installed in the system PATH to create installer.\nPlease download and install MakeNSIS in the PATH from http://nsis.sourceforge.net/Main_Page"
           rSuccess = false
         end
 
@@ -40,7 +39,7 @@ module RubyPackager
         rFileName = nil
 
         if (iReleaseInfo.InstallInfo[:NSISFileName] == nil)
-          puts '!!! No NSISFileName specified among the Install description.'
+          logErr 'No NSISFileName specified among the Install description.'
         else
           lNSISOK = system("makensis /DVERSION=#{iVersion} \"/DRELEASEDIR=#{iReleaseDir.gsub(/\//,'\\')}\" \"#{iRootDir.gsub(/\//,'\\')}\\#{iReleaseInfo.InstallInfo[:NSISFileName].gsub(/\//,'\\')}\"")
           if (lNSISOK)
