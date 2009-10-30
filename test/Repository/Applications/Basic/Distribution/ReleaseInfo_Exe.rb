@@ -20,5 +20,14 @@ RubyPackager::ReleaseInfo.new.
     :DevStatus => 'Project:DevStatus'
   ).
   addCoreFiles( [
-    'MainLib.rb'
-  ] )
+    '*'
+  ] ).
+  executable(
+    :StartupRBFile => 'Main.rb',
+    :ExeName => 'ExeName',
+    :IconName => "Distribution/#{RUBY_PLATFORM}/Icon.ico",
+    :TerminalApplication => false
+  ).
+  install(
+    :NSISFileName => "Distribution/#{RUBY_PLATFORM}/Installer/install.nsi"
+  )

@@ -16,6 +16,8 @@ $LOAD_PATH << "#{lRootDir}/test"
 require 'bin/Release'
 require 'Common'
 
-# Run the test cases for our platform
-require "#{File.dirname(__FILE__)}/PlatformIndependent/run"
-require "#{File.dirname(__FILE__)}/#{RUBY_PLATFORM}/run"
+# Run the test cases for our platform only
+( Dir.glob("#{File.dirname(__FILE__)}/PlatformIndependent/*.rb") +
+  Dir.glob("#{File.dirname(__FILE__)}/#{RUBY_PLATFORM}/*.rb") ).each do |iFileName|
+  require iFileName
+end

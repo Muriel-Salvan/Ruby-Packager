@@ -105,14 +105,16 @@ module RubyPackager
         end
         @Installers.each do |iInstallerName|
           @PluginsManager.accessPlugin('Installers', iInstallerName) do |ioPlugin|
-            if (!ioPlugin.checkTools)
+            if ((ioPlugin.respond_to?(:checkTools)) and
+                (!ioPlugin.checkTools))
               rSuccess = false
             end
           end
         end
         @Distributors.each do |iDistributorName|
           @PluginsManager.accessPlugin('Distributors', iDistributorName) do |ioPlugin|
-            if (!ioPlugin.checkTools)
+            if ((ioPlugin.respond_to?(:checkTools)) and
+                (!ioPlugin.checkTools))
               rSuccess = false
             end
           end
@@ -197,7 +199,7 @@ module RubyPackager
         if (@ReleaseTags.empty?)
           lStrTags = ':Tags => []'
         else
-          lStrTags = ":Tags => [ '#{@ReleaseTags.join('\' \'')}' ]"
+          lStrTags = ":Tags => [ '#{@ReleaseTags.join('\', \'')}' ]"
         end
         File.open("#{@ReleaseDir}/ReleaseInfo", 'w') do |oFile|
           oFile << "
@@ -222,8 +224,10 @@ module RubyPackager
         logOp('Copy additional files') do
           RubyPackager::copyFiles(@RootDir, @ReleaseDir, @ReleaseInfo.AdditionalFiles)
         end
-        logOp('Copy test files') do
-          RubyPackager::copyFiles(@RootDir, @ReleaseDir, @ReleaseInfo.TestFiles)
+        if (@IncludeTest)
+          logOp('Copy test files') do
+            RubyPackager::copyFiles(@RootDir, @ReleaseDir, @ReleaseInfo.TestFiles)
+          end
         end
       end
 
@@ -258,21 +262,27 @@ module RubyPackager
       }
       gem 'rdoc'
       require 'rdoc/rdoc'
-      lOldDir = Dir.getwd
-      Dir.chdir(@ReleaseDir)
-      RDoc::RDoc.new.document( [
+      lRDocOptions = [
         '--line-numbers',
         '--tab-width=2',
         "--title=#{@ReleaseInfo.ProjectInfo[:Name].gsub(/'/,'\\\\\'')} v#{@ReleaseVersion}",
         '--fileboxes',
-        '--fmt=muriel',
         '--exclude=.svn',
         '--exclude=nbproject',
         '--exclude=Done.txt',
         "--exclude=Releases",
         "--output=#{@DocDir}/rdoc"
-        # Bug (RDoc): Sometimes it does not change current directory correctly (not deterministic)
-      ] )
+      ]
+      # Bug (RDoc): Sometimes it does not change current directory correctly (not deterministic)
+      lOldDir = Dir.getwd
+      Dir.chdir(@ReleaseDir)
+      # First try with Muriel's template
+      begin
+        RDoc::RDoc.new.document( lRDocOptions + [ '--fmt=muriel' ] )
+      rescue Exception
+        # Then try with default template
+        RDoc::RDoc.new.document( lRDocOptions )
+      end
       Dir.chdir(lOldDir)
 
       return rSuccess

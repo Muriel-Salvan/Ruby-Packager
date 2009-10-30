@@ -21,4 +21,7 @@ RubyPackager::ReleaseInfo.new.
   ).
   addCoreFiles( [
     'MainLib.rb'
+  ] ).
+  addAdditionalFiles( [
+    'Add.rb'
   ] )
