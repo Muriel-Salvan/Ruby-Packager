@@ -120,6 +120,7 @@ module RubyPackager
     # Parameters:
     # * *iParams* (<em>map<Symbol,Object></em>): The parameters:
     # ** *:NSISFileName* (_String_): Name of the NSI file to use to generate the installer
+    # ** *:InstallerName* (_String_): Name of the generated installer
     # Return:
     # * _ReleaseInfo_: self
     def install(iParams)

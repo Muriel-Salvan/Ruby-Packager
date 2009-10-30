@@ -16,6 +16,8 @@ module RubyPackager
   # Class giving command line options for the releaser
   class Launcher
 
+    FILE_PATH = File.expand_path(__FILE__)
+
     # Run the releaser
     #
     # Parameters:
@@ -28,10 +30,10 @@ module RubyPackager
       # Parse for plugins
       require 'rUtilAnts/Plugins'
       lPluginsManager = RUtilAnts::Plugins::PluginsManager.new
-      lPluginsManager.parsePluginsFromDir('Installers', "#{File.dirname(__FILE__)}/../lib/RubyPackager/Installers", 'RubyPackager::Installers')
-      lPluginsManager.parsePluginsFromDir('Installers', "#{File.dirname(__FILE__)}/../lib/RubyPackager/#{RUBY_PLATFORM}/Installers", 'RubyPackager::Installers')
-      lPluginsManager.parsePluginsFromDir('Distributors', "#{File.dirname(__FILE__)}/../lib/RubyPackager/Distributors", 'RubyPackager::Distributors')
-      lPluginsManager.parsePluginsFromDir('Distributors', "#{File.dirname(__FILE__)}/../lib/RubyPackager/#{RUBY_PLATFORM}/Distributors", 'RubyPackager::Distributors')
+      lPluginsManager.parsePluginsFromDir('Installers', "#{File.dirname(FILE_PATH)}/../lib/RubyPackager/Installers", 'RubyPackager::Installers')
+      lPluginsManager.parsePluginsFromDir('Installers', "#{File.dirname(FILE_PATH)}/../lib/RubyPackager/#{RUBY_PLATFORM}/Installers", 'RubyPackager::Installers')
+      lPluginsManager.parsePluginsFromDir('Distributors', "#{File.dirname(FILE_PATH)}/../lib/RubyPackager/Distributors", 'RubyPackager::Distributors')
+      lPluginsManager.parsePluginsFromDir('Distributors', "#{File.dirname(FILE_PATH)}/../lib/RubyPackager/#{RUBY_PLATFORM}/Distributors", 'RubyPackager::Distributors')
 
       # Parse command line arguments
       # Variables set by the parser
@@ -41,6 +43,7 @@ module RubyPackager
       lReleaseComment = nil
       lIncludeRuby = false
       lIncludeTest = false
+      lIncludeRDoc = true
       lInstallers = []
       lDistributors = []
       # The parser
@@ -73,6 +76,10 @@ module RubyPackager
       lOptionsParser.on('-n', '--includeTest',
         'Include Test files in the release.') do
         lIncludeTest = true
+      end
+      lOptionsParser.on('-o', '--no-rdoc',
+        'Do NOT generate RDoc.') do
+        lIncludeRDoc = false
       end
       lOptionsParser.on('-i', '--installer <InstallerName>', String,
         '<InstallerName>: Name of an Installer to use.',
@@ -147,6 +154,7 @@ module RubyPackager
             lReleaseComment,
             lIncludeRuby,
             lIncludeTest,
+            lIncludeRDoc,
             lInstallers,
             lDistributors
           ).execute

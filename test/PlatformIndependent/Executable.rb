@@ -17,7 +17,7 @@ module RubyPackager
         def testBasicExecutable
           execTest('Applications/Basic', [], 'ReleaseInfo.rb') do |iReleaseDir, iReleaseInfo|
             checkReleaseInfo(iReleaseDir, iReleaseInfo)
-            checkDoc(iReleaseDir, iReleaseInfo)
+            checkReleaseNotes(iReleaseDir, iReleaseInfo)
             assert(File.exists?("#{iReleaseDir}/Release/Main.rb"))
           end
         end

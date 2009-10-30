@@ -17,7 +17,7 @@ module RubyPackager
         def testVersion
           execTest('Libraries/Basic', [ '-v', '0.0.1.20091030' ], 'ReleaseInfo.rb') do |iReleaseDir, iReleaseInfo|
             checkReleaseInfo(iReleaseDir, iReleaseInfo, :Version => '0.0.1.20091030')
-            checkDoc(iReleaseDir, iReleaseInfo)
+            checkReleaseNotes(iReleaseDir, iReleaseInfo)
             assert(File.exists?("#{iReleaseDir}/Release/MainLib.rb"))
           end
         end
@@ -26,7 +26,7 @@ module RubyPackager
         def testVersionLong
           execTest('Libraries/Basic', [ '--version=0.0.1.20091030' ], 'ReleaseInfo.rb') do |iReleaseDir, iReleaseInfo|
             checkReleaseInfo(iReleaseDir, iReleaseInfo, :Version => '0.0.1.20091030')
-            checkDoc(iReleaseDir, iReleaseInfo)
+            checkReleaseNotes(iReleaseDir, iReleaseInfo)
             assert(File.exists?("#{iReleaseDir}/Release/MainLib.rb"))
           end
         end
@@ -35,7 +35,7 @@ module RubyPackager
         def testTags
           execTest('Libraries/Basic', [ '-t', 'Tag1', '-t', 'Tag2' ], 'ReleaseInfo.rb') do |iReleaseDir, iReleaseInfo|
             checkReleaseInfo(iReleaseDir, iReleaseInfo, :Tags => ['Tag1', 'Tag2'] )
-            checkDoc(iReleaseDir, iReleaseInfo)
+            checkReleaseNotes(iReleaseDir, iReleaseInfo)
             assert(File.exists?("#{iReleaseDir}/Release/MainLib.rb"))
           end
         end
@@ -44,7 +44,7 @@ module RubyPackager
         def testTagsLong
           execTest('Libraries/Basic', [ '--tag=Tag1', '--tag=Tag2' ], 'ReleaseInfo.rb') do |iReleaseDir, iReleaseInfo|
             checkReleaseInfo(iReleaseDir, iReleaseInfo, :Tags => ['Tag1', 'Tag2'] )
-            checkDoc(iReleaseDir, iReleaseInfo)
+            checkReleaseNotes(iReleaseDir, iReleaseInfo)
             assert(File.exists?("#{iReleaseDir}/Release/MainLib.rb"))
           end
         end
@@ -53,7 +53,7 @@ module RubyPackager
         def testComment
           execTest('Libraries/Basic', [ '-c', 'Comment' ], 'ReleaseInfo.rb') do |iReleaseDir, iReleaseInfo|
             checkReleaseInfo(iReleaseDir, iReleaseInfo)
-            checkDoc(iReleaseDir, iReleaseInfo)
+            checkReleaseNotes(iReleaseDir, iReleaseInfo)
             assert(File.exists?("#{iReleaseDir}/Release/MainLib.rb"))
           end
         end
@@ -62,7 +62,7 @@ module RubyPackager
         def testCommentLong
           execTest('Libraries/Basic', [ '--comment=Comment' ], 'ReleaseInfo.rb') do |iReleaseDir, iReleaseInfo|
             checkReleaseInfo(iReleaseDir, iReleaseInfo)
-            checkDoc(iReleaseDir, iReleaseInfo)
+            checkReleaseNotes(iReleaseDir, iReleaseInfo)
             assert(File.exists?("#{iReleaseDir}/Release/MainLib.rb"))
           end
         end
@@ -71,7 +71,7 @@ module RubyPackager
         def testTest
           execTest('Libraries/Basic', [ '-n' ], 'ReleaseInfo_Test.rb') do |iReleaseDir, iReleaseInfo|
             checkReleaseInfo(iReleaseDir, iReleaseInfo)
-            checkDoc(iReleaseDir, iReleaseInfo)
+            checkReleaseNotes(iReleaseDir, iReleaseInfo)
             assert(File.exists?("#{iReleaseDir}/Release/MainLib.rb"))
             assert(File.exists?("#{iReleaseDir}/Release/Test.rb"))
           end
@@ -81,7 +81,7 @@ module RubyPackager
         def testTestLong
           execTest('Libraries/Basic', [ '--includeTest' ], 'ReleaseInfo_Test.rb') do |iReleaseDir, iReleaseInfo|
             checkReleaseInfo(iReleaseDir, iReleaseInfo)
-            checkDoc(iReleaseDir, iReleaseInfo)
+            checkReleaseNotes(iReleaseDir, iReleaseInfo)
             assert(File.exists?("#{iReleaseDir}/Release/MainLib.rb"))
             assert(File.exists?("#{iReleaseDir}/Release/Test.rb"))
           end
@@ -91,7 +91,7 @@ module RubyPackager
         def testInstallers
           execTest('Libraries/Basic', [ '-i', 'DummyInstaller1', '-i', 'DummyInstaller2' ], 'ReleaseInfo.rb') do |iReleaseDir, iReleaseInfo|
             checkReleaseInfo(iReleaseDir, iReleaseInfo)
-            checkDoc(iReleaseDir, iReleaseInfo)
+            checkReleaseNotes(iReleaseDir, iReleaseInfo)
             assert(File.exists?("#{iReleaseDir}/Release/MainLib.rb"))
             assert(File.exists?("#{iReleaseDir}/Installer/MainLib.rb.Installer1"))
             assert(File.exists?("#{iReleaseDir}/Installer/MainLib.rb.Installer2"))
@@ -102,7 +102,7 @@ module RubyPackager
         def testInstallersLong
           execTest('Libraries/Basic', [ '--installer=DummyInstaller1', '--installer=DummyInstaller2' ], 'ReleaseInfo.rb') do |iReleaseDir, iReleaseInfo|
             checkReleaseInfo(iReleaseDir, iReleaseInfo)
-            checkDoc(iReleaseDir, iReleaseInfo)
+            checkReleaseNotes(iReleaseDir, iReleaseInfo)
             assert(File.exists?("#{iReleaseDir}/Release/MainLib.rb"))
             assert(File.exists?("#{iReleaseDir}/Installer/MainLib.rb.Installer1"))
             assert(File.exists?("#{iReleaseDir}/Installer/MainLib.rb.Installer2"))
@@ -113,7 +113,7 @@ module RubyPackager
         def testDistributors
           execTest('Libraries/Basic', [ '-i', 'DummyInstaller1', '-i', 'DummyInstaller2', '-d', 'DummyDistributor1', '-d', 'DummyDistributor2' ], 'ReleaseInfo.rb') do |iReleaseDir, iReleaseInfo|
             checkReleaseInfo(iReleaseDir, iReleaseInfo)
-            checkDoc(iReleaseDir, iReleaseInfo)
+            checkReleaseNotes(iReleaseDir, iReleaseInfo)
             assert(File.exists?("#{iReleaseDir}/Release/MainLib.rb"))
             assert(File.exists?("#{iReleaseDir}/Installer/MainLib.rb.Installer1"))
             assert(File.exists?("#{iReleaseDir}/Installer/MainLib.rb.Installer2"))
@@ -132,7 +132,7 @@ module RubyPackager
         def testDistributorsLong
           execTest('Libraries/Basic', [ '-i', 'DummyInstaller1', '-i', 'DummyInstaller2', '--distributor=DummyDistributor1', '--distributor=DummyDistributor2' ], 'ReleaseInfo.rb') do |iReleaseDir, iReleaseInfo|
             checkReleaseInfo(iReleaseDir, iReleaseInfo)
-            checkDoc(iReleaseDir, iReleaseInfo)
+            checkReleaseNotes(iReleaseDir, iReleaseInfo)
             assert(File.exists?("#{iReleaseDir}/Release/MainLib.rb"))
             assert(File.exists?("#{iReleaseDir}/Installer/MainLib.rb.Installer1"))
             assert(File.exists?("#{iReleaseDir}/Installer/MainLib.rb.Installer2"))

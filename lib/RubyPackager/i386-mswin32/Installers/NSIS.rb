@@ -45,7 +45,7 @@ module RubyPackager
           lNSISOK = system("makensis /DVERSION=#{iVersion} \"/DRELEASEDIR=#{iReleaseDir.gsub(/\//,'\\')}\" \"#{iRootDir.gsub(/\//,'\\')}\\#{iReleaseInfo.InstallInfo[:NSISFileName].gsub(/\//,'\\')}\"")
           if (lNSISOK)
             lInstallerDir = File.dirname("#{iRootDir}/#{iReleaseInfo.InstallInfo[:NSISFileName]}")
-            rFileName = "#{iReleaseInfo.ExecutableInfo[:ExeName]}_#{iVersion}_setup.exe"
+            rFileName = "#{iReleaseInfo.InstallInfo[:InstallerName]}_#{iVersion}_setup.exe"
             FileUtils.mv("#{lInstallerDir}/setup.exe", "#{iInstallerDir}/#{rFileName}")
           end
         end

@@ -60,10 +60,11 @@ module RubyPackager
     # * *iReleaseComment* (_String_): Comment accompanying this release
     # * *iIncludeRuby* (_Boolean_): Do we include Ruby in the release ?
     # * *iIncludeTest* (_Boolean_): Do we include test files in the release ?
+    # * *iGenerateRDoc* (_Boolean_): Do we generate RDoc ?
     # * *iInstallers* (<em>list<String></em>): The list of installers to generate
     # * *iDistributors* (<em>list<String></em>): The list of distributors to ship installers to
-    def initialize(iPluginsManager, iReleaseInfo, iRootDir, iReleaseBaseDir, iPlatformReleaseInfo, iReleaseVersion, iReleaseTags, iReleaseComment, iIncludeRuby, iIncludeTest, iInstallers, iDistributors)
-      @PluginsManager, @ReleaseInfo, @RootDir, @ReleaseBaseDir, @PlatformReleaseInfo, @ReleaseVersion, @ReleaseTags, @ReleaseComment, @IncludeRuby, @IncludeTest, @Installers, @Distributors = iPluginsManager, iReleaseInfo, iRootDir, iReleaseBaseDir, iPlatformReleaseInfo, iReleaseVersion, iReleaseTags, iReleaseComment, iIncludeRuby, iIncludeTest, iInstallers, iDistributors
+    def initialize(iPluginsManager, iReleaseInfo, iRootDir, iReleaseBaseDir, iPlatformReleaseInfo, iReleaseVersion, iReleaseTags, iReleaseComment, iIncludeRuby, iIncludeTest, iGenerateRDoc, iInstallers, iDistributors)
+      @PluginsManager, @ReleaseInfo, @RootDir, @ReleaseBaseDir, @PlatformReleaseInfo, @ReleaseVersion, @ReleaseTags, @ReleaseComment, @IncludeRuby, @IncludeTest, @GenerateRDoc, @Installers, @Distributors = iPluginsManager, iReleaseInfo, iRootDir, iReleaseBaseDir, iPlatformReleaseInfo, iReleaseVersion, iReleaseTags, iReleaseComment, iIncludeRuby, iIncludeTest, iGenerateRDoc, iInstallers, iDistributors
       @GemName = "#{@ReleaseInfo.GemInfo[:GemName]}-#{@ReleaseVersion}.gem"
       # Compute the release directory name
       lStrOptions = 'Normal'
@@ -80,6 +81,10 @@ module RubyPackager
       @InstallerDir = "#{@ReleaseDir}/Installer"
       @DocDir = "#{@ReleaseDir}/Documentation"
       @ReleaseDir += '/Release'
+      require 'fileutils'
+      FileUtils.mkdir_p(@ReleaseDir)
+      FileUtils.mkdir_p(@InstallerDir)
+      FileUtils.mkdir_p(@DocDir)
     end
 
     # Release
@@ -125,7 +130,9 @@ module RubyPackager
         rSuccess = releaseFiles
         if (rSuccess)
           # Generate documentation
-          rSuccess = generateRDoc
+          if (@GenerateRDoc)
+            rSuccess = generateRDoc
+          end
           if (rSuccess)
             # Generate Release notes
             rSuccess = generateReleaseNote_HTML
@@ -136,9 +143,6 @@ module RubyPackager
                 # List of files generated to distribute
                 # list< String >
                 lGeneratedInstallers = []
-                if (!@Installers.empty?)
-                  FileUtils::mkdir_p(@InstallerDir)
-                end
                 @Installers.each do |iInstallerName|
                   logOp("Create installer #{iInstallerName}") do
                     @PluginsManager.accessPlugin('Installers', iInstallerName) do |ioPlugin|

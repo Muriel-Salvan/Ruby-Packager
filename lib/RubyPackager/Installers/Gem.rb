@@ -9,14 +9,6 @@ module RubyPackager
 
     class Gem
 
-      # Check that we can use this installer
-      #
-      # Return:
-      # * _Boolean_: Can we use this installer ?
-      def checkTools
-        return true
-      end
-
       # Create the installer with everything in the release directory.
       #
       # Parameters:

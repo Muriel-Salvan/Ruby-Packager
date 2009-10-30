@@ -59,7 +59,10 @@ module RubyPackager
         @SFReleaseDir = "/home/frs/project/#{@SFProjectSubPath}/#{@ReleaseVersion}"
         createSFShell
         createReleaseOnSFNET
-        uploadRDocOnSFNET
+        # It is possible that he RDoc has not been generated
+        if (File.exists?("#{@DocDir}/rdoc"))
+          uploadRDocOnSFNET
+        end
         uploadReleaseNoteOnSFNET
         uploadFilesOnSFNET
 

@@ -4,7 +4,8 @@
 ** Create FAQ
 
 * Testing
-** More complete regression
+** Test that each possible option from ReleaseInfo is used correctly in every context (Installers, Distributors...)
+** Test checkTools on ReleaseInfo, Installers and Distributors
 
 * Development
 ** Make it run under Linux

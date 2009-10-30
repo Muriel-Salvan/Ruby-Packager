@@ -4,7 +4,9 @@
 #++
 
 require 'fileutils'
+# Require rUtilAnts and RubyPackager now because we will redefine methods and classes in them.
 require 'rUtilAnts/Plugins'
+require 'RubyPackager/Tools'
 
 # Bypass the creation of any PluginsManager to include our dummy plugins automatically
 module RUtilAnts
@@ -16,6 +18,7 @@ module RUtilAnts
 
     class PluginsManager < PluginsManager_ORG
 
+      # Constructor
       def initialize
         super
         # Add dummy Installers and Distributors
@@ -32,6 +35,45 @@ module RUtilAnts
 end
 
 module RubyPackager
+
+  # Redefine some functions used to communicate with external sites
+  module Tools
+
+    remove_method :sshWithPassword
+
+    # Execute some SSH command on a remote host protected with password
+    #
+    # Parameters:
+    # * *iSSHHost* (_String_): The SSH host
+    # * *iSSHLogin* (_String_): The SSH login
+    # * *iCmd* (_String_): The command to execute
+    def sshWithPassword(iSSHHost, iSSHLogin, iCmd)
+      $SSHCommands << [ 'SSH', {
+        :Host => iSSHHost,
+        :Login => iSSHLogin,
+        :Cmd => iCmd
+      } ]
+    end
+
+    remove_method :scpWithPassword
+
+    # Copy files through SCP.
+    #
+    # Parameters:
+    # * *iSCPHost* (_String_): Host
+    # * *iSCPLogin* (_String_): Login
+    # * *iFileSrc* (_String_): Path to local file to copy from
+    # * *iFileDst* (_String_): Path to remote file to copy to
+    def scpWithPassword(iSCPHost, iSCPLogin, iFileSrc, iFileDst)
+      $SSHCommands << [ 'SCP', {
+        :Host => iSCPHost,
+        :Login => iSCPLogin,
+        :FileSrc => iFileSrc,
+        :FileDst => iFileDst
+      } ]
+    end
+
+  end
 
   module Test
 
@@ -151,10 +193,21 @@ module RubyPackager
       # * *iRepositoryName* (_String_): Name of the repository for the test
       # * *iArguments* (<em>list<String></em>): List of arguments to give to RubyPackager (except the release file)
       # * *iReleaseFileName* (_String_): Name of the release file, relatively to the Distribution directory of the application
+      # * *iParams* (<em>map<Symbol,Object></em>): Additional parameters [optional = {}]
+      # ** *:IncludeRDoc* (_Boolean_): Do we generate RDoc ? [optional = false]
       # * _CodeBlock_: The code called once the released has been made
       # ** *iReleaseDir* (_String_): The directory in which the release has been made
       # ** *iReleaseInfo* (<em>RubyPackager::ReleaseInfo</em>): The release info read
-      def execTest(iRepositoryName, iArguments, iReleaseInfoFileName)
+      def execTest(iRepositoryName, iArguments, iReleaseInfoFileName, iParams = {})
+        lIncludeRDoc = iParams[:IncludeRDoc]
+        if (lIncludeRDoc == nil)
+          lIncludeRDoc = false
+        end
+        # Reset variables that will be used by dummy Distributors
+        # The list of commands SSH/SCP issued, along with their parameters
+        # list< [ String,      map< Symbol,        Object > ] >
+        # list< [ CommandName, map< AttributeName, Value  > ] >
+        $SSHCommands = []
         # Go to the application directory
         lOldDir = Dir.getwd
         lAppDir = File.expand_path("#{File.dirname(__FILE__)}/Repository/#{iRepositoryName}")
@@ -163,7 +216,12 @@ module RubyPackager
         FileUtils::rm_rf("#{lAppDir}/Releases")
         # Launch everything
         lRealReleaseInfoFileName = "Distribution/#{iReleaseInfoFileName}"
-        lSuccess = RubyPackager::Launcher.new.run(iArguments + [ lRealReleaseInfoFileName ])
+        lSuccess = nil
+        if (lIncludeRDoc)
+          lSuccess = RubyPackager::Launcher.new.run(iArguments + [ lRealReleaseInfoFileName ])
+        else
+          lSuccess = RubyPackager::Launcher.new.run(iArguments + [ '--no-rdoc', lRealReleaseInfoFileName ])
+        end
         Dir.chdir(lOldDir)
         # Check if everything is ok
         assert(lSuccess)
@@ -210,13 +268,21 @@ module RubyPackager
         assert_equal('Project:DevStatus', lReleasedInfo[:DevStatus])
       end
 
-      # Check generated documentation (Release notes, RDoc...)
+      # Check generated RDoc
       #
       # Parameters:
       # * *iReleaseDir* (_String_): The directory of the release
       # * *iReleaseInfo* (<em>RubyPackager::ReleaseInfo</em>): The release info used by the release
-      def checkDoc(iReleaseDir, iReleaseInfo)
+      def checkRDoc(iReleaseDir, iReleaseInfo)
         assert(File.exists?("#{iReleaseDir}/Documentation/rdoc/index.html"))
+      end
+
+      # Check generated release notes
+      #
+      # Parameters:
+      # * *iReleaseDir* (_String_): The directory of the release
+      # * *iReleaseInfo* (<em>RubyPackager::ReleaseInfo</em>): The release info used by the release
+      def checkReleaseNotes(iReleaseDir, iReleaseInfo)
         assert(File.exists?("#{iReleaseDir}/Documentation/ReleaseNote.html"))
         assert(File.exists?("#{iReleaseDir}/Documentation/ReleaseNote.txt"))
       end

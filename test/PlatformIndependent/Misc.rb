@@ -17,7 +17,7 @@ module RubyPackager
         def testWithoutTest
           execTest('Libraries/Basic', [], 'ReleaseInfo_Test.rb') do |iReleaseDir, iReleaseInfo|
             checkReleaseInfo(iReleaseDir, iReleaseInfo)
-            checkDoc(iReleaseDir, iReleaseInfo)
+            checkReleaseNotes(iReleaseDir, iReleaseInfo)
             assert(File.exists?("#{iReleaseDir}/Release/MainLib.rb"))
             assert(!File.exists?("#{iReleaseDir}/Release/Test.rb"))
           end
@@ -27,7 +27,7 @@ module RubyPackager
         def testWithTest
           execTest('Libraries/Basic', [ '-n' ], 'ReleaseInfo_Test.rb') do |iReleaseDir, iReleaseInfo|
             checkReleaseInfo(iReleaseDir, iReleaseInfo)
-            checkDoc(iReleaseDir, iReleaseInfo)
+            checkReleaseNotes(iReleaseDir, iReleaseInfo)
             assert(File.exists?("#{iReleaseDir}/Release/MainLib.rb"))
             assert(File.exists?("#{iReleaseDir}/Release/Test.rb"))
           end
@@ -37,9 +37,19 @@ module RubyPackager
         def testWithAdditional
           execTest('Libraries/Basic', [], 'ReleaseInfo_Additional.rb') do |iReleaseDir, iReleaseInfo|
             checkReleaseInfo(iReleaseDir, iReleaseInfo)
-            checkDoc(iReleaseDir, iReleaseInfo)
+            checkReleaseNotes(iReleaseDir, iReleaseInfo)
             assert(File.exists?("#{iReleaseDir}/Release/MainLib.rb"))
             assert(File.exists?("#{iReleaseDir}/Release/Add.rb"))
+          end
+        end
+
+        # Test release with RDoc
+        def testWithRDoc
+          execTest('Libraries/Basic', [], 'ReleaseInfo.rb', :IncludeRDoc => true) do |iReleaseDir, iReleaseInfo|
+            checkReleaseInfo(iReleaseDir, iReleaseInfo)
+            checkReleaseNotes(iReleaseDir, iReleaseInfo)
+            checkRDoc(iReleaseDir, iReleaseInfo)
+            assert(File.exists?("#{iReleaseDir}/Release/MainLib.rb"))
           end
         end
 
