@@ -289,6 +289,32 @@ module RubyPackager
         assert(File.exists?("#{iReleaseDir}/Documentation/ReleaseNote.txt"))
       end
 
+      # Run a generated executable and get its output
+      #
+      # Parameters:
+      # * *iFileName* (_String_): The file name to execute
+      # Return:
+      # * _String_: The output
+      def runExe(lExeFileName)
+        rOutput = nil
+
+        lOldDir = Dir.getwd
+        Dir.chdir(File.dirname(lExeFileName))
+        begin
+          begin
+            rOutput = `#{File.basename(lExeFileName)}`
+          rescue Exception
+            assert(false)
+          end
+        rescue Exception
+          Dir.chdir(lOldDir)
+          raise
+        end
+        Dir.chdir(lOldDir)
+
+        return rOutput
+      end
+
     end
 
   end
