@@ -1,0 +1,14 @@
+bin/allinoneruby
+
+< $0.replace(realstuff) if isapplication
+
+> if isapplication
+>   $_0 = realstuff
+>   alias $__0 $0
+>   alias $0 $_0
+> end
+>
+> # Remove non existing directories from $LOAD_PATH
+> $LOAD_PATH.delete_if do |iDir|
+>   next (!File.exists?(iDir))
+> end

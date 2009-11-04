@@ -302,7 +302,8 @@ module RubyPackager
         Dir.chdir(File.dirname(lExeFileName))
         begin
           begin
-            rOutput = `#{File.basename(lExeFileName)}`
+            # TODO: Bug ???: On Linux, we need to "cd ." before, otherwise the executable is not found. Understand why and remove it.
+            rOutput = `cd .;#{File.basename(lExeFileName)}`
           rescue Exception
             assert(false)
           end
