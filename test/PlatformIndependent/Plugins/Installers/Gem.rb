@@ -25,11 +25,7 @@ module RubyPackager
                 lGemName = "#{iReleaseDir}/Installer/GemName-0.0.1.20091030.gem"
                 assert(File.exists?(lGemName))
                 # Get back the specification to check it
-                lOldDir = Dir.getwd
-                Dir.chdir(File.dirname(lGemName))
-                require 'rubygems'
-                lGemSpec = eval(`gem.bat specification #{File.basename(lGemName)} --ruby`.gsub(/Gem::/,'::Gem::'))
-                Dir.chdir(lOldDir)
+                lGemSpec = getGemSpec(lGemName)
                 assert_equal('GemName', lGemSpec.name)
                 assert_equal(::Gem::Version.new('0.0.1.20091030'), lGemSpec.version)
                 assert_equal(['Author:Name'], lGemSpec.authors)
@@ -87,11 +83,7 @@ module RubyPackager
                 lGemName = "#{iReleaseDir}/Installer/GemName-0.0.1.20091030.gem"
                 assert(File.exists?(lGemName))
                 # Get back the specification to check it
-                lOldDir = Dir.getwd
-                Dir.chdir(File.dirname(lGemName))
-                require 'rubygems'
-                lGemSpec = eval(`gem.bat specification #{File.basename(lGemName)} --ruby`.gsub(/Gem::/,'::Gem::'))
-                Dir.chdir(lOldDir)
+                lGemSpec = getGemSpec(lGemName)
                 assert_equal('GemName', lGemSpec.name)
                 assert_equal(::Gem::Version.new('0.0.1.20091030'), lGemSpec.version)
                 assert_equal(['Author:Name'], lGemSpec.authors)
@@ -119,11 +111,7 @@ module RubyPackager
                 lGemName = "#{iReleaseDir}/Installer/GemName-0.0.1.20091030.gem"
                 assert(File.exists?(lGemName))
                 # Get back the specification to check it
-                lOldDir = Dir.getwd
-                Dir.chdir(File.dirname(lGemName))
-                require 'rubygems'
-                lGemSpec = eval(`gem.bat specification #{File.basename(lGemName)} --ruby`.gsub(/Gem::/,'::Gem::'))
-                Dir.chdir(lOldDir)
+                lGemSpec = getGemSpec(lGemName)
                 assert_equal('GemName', lGemSpec.name)
                 assert_equal(::Gem::Version.new('0.0.1.20091030'), lGemSpec.version)
                 assert_equal(['Author:Name'], lGemSpec.authors)

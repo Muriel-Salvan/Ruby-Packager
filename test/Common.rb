@@ -7,7 +7,7 @@ require 'fileutils'
 # Require rUtilAnts and RubyPackager now because we will redefine methods and classes in them.
 require 'rUtilAnts/Plugins'
 require 'RubyPackager/Tools'
-# Change the Logging initialization to mute everything
+# Mute everything except errors
 RUtilAnts::Logging::initializeLogging(File.dirname(__FILE__), 'http://sourceforge.net/tracker/?group_id=274236&atid=1165400', true)
 
 # Bypass the creation of any PluginsManager to include our dummy plugins automatically
@@ -315,6 +315,29 @@ module RubyPackager
         return rOutput
       end
 
+      # Get the gem specification corresponding to a given gem file
+      #
+      # Parameters:
+      # * *iGemFileName* (_String_): Name of the Gem file
+      # Return:
+      # * <em>Gem::Specification</em>: The corresponding Gem specification
+      def getGemSpec(iGemFileName)
+        rGemSpec = nil
+
+        lOldDir = Dir.getwd
+        Dir.chdir(File.dirname(iGemFileName))
+        require 'rubygems'
+        # TODO: Bug (Ruby): Remove this test when Ruby will be able to deal .bat files correctly.
+        if (RUBY_PLATFORM == 'i386-mswin32')
+          rGemSpec = eval(`gem.bat specification #{File.basename(iGemFileName)} --ruby`.gsub(/Gem::/,'::Gem::'))
+        else
+          rGemSpec = eval(`gem specification #{File.basename(iGemFileName)} --ruby`.gsub(/Gem::/,'::Gem::'))
+        end
+        Dir.chdir(lOldDir)
+
+        return rGemSpec
+      end
+      
     end
 
   end
