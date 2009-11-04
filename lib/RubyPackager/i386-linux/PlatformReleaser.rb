@@ -93,11 +93,12 @@ then
     echo 'Extracting Ruby distribution...'
     mkdir tempruby
     cd tempruby
-    ../#{lBinName} --eee-justextract
+    ../#{lBinSubDir}/#{lBinName} --eee-justextract
     cd ..
   fi
   \# Set the environment correctly to execute Ruby from the extracted dir
-  export LD_LIBRARY_PATH=`pwd`/temp/lib:${LD_LIRARY_PATH}
+  export LD_LIBRARY_PATH=`pwd`/tempruby/bin:`pwd`/tempruby/lib:`pwd`/tempruby/lib/lib1:`pwd`/tempruby/lib/lib2:`pwd`/tempruby/lib/lib3:`pwd`/tempruby/lib/lib4:${LD_LIRARY_PATH}
+  export RUBYOPT=
   ./tempruby/bin/ruby -w #{iReleaseInfo.ExecutableInfo[:StartupRBFile]}
 else
   echo 'Ruby found on current platform. Use it directly.'
