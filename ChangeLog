@@ -1,5 +1,55 @@
 = RubyPackager Release History
 
+== 0.1.1.20091105 (Alpha)
+
+=== New features
+
+* Implemented generation of Linux executables, with and without Ruby (with Ruby not tested correctly yet)
+* Moved directory containing modifications to perform in a separate place (Modifications dir)
+* Regression: Added test cases for Linux executables generated.
+* Adapted regression to run correctly under Linux.
+* -h option also gives the version of RubyPackager.
+* --debug option enables debugging logs.
+* Used rUtilAnts/Logging for logging.
+* Give the possibility to not generate RDoc by --no-rdoc command line option.
+* SourceForge distributor handles RDoc only if it has been generated.
+* NSIS installer does not need anymore ExeName to be set: use an additional InstallerName property instead.
+* Removed useless checkTools method from Gem Installer.
+* RubyPackager automatically creates directories Installer, Documentation and Release to not let this be done by plugins.
+* Try Muriel templates for RDoc, and switch back to default template in case of error.
+* Added RDoc modifications to make before using RubyPackager.
+* Use Muriel templates when generating RDoc.
+* No need anymore to set $ReleaseInfo variable in ReleaseInfo files.
+* Adapted RubyPackager's ReleaseInfo to the new interface.
+* Removed useless checkTools method from ReleaseInfo.
+
+=== Regression
+
+* Regression: Logging errors correctly.
+* Regression: Added test cases for binaries created with and without Ruby on Windows.
+* Regression: Muted output (still remains external programs output)
+* Regression: Added test cases for:
+** Gem Installer
+** NSIS Installer
+** SourceForge Distributor
+* Regression: Better organization of test cases.
+* Regression: Added test cases for:
+** Command line options.
+** Basic library release.
+** Basic executable release.
+* Regression: Added checks for ReleaseInfo file presence and content.
+* Regression: Refactored regression to cope with new interface.
+* Regression: Added a simple library release test.
+
+=== Bug corrections
+
+* Bug correction: When RubyPackager's Launcher was invoked after having changed current directory, it could not find plugins anymore.
+* Bug correction: when Installers or Distributors did not define checkTools, an error was issued.
+* Bug correction: Generated ReleaseInfo file was reporting Tags incorrectly.
+* Bug correction: Test files were included in releases even without -n flag.
+* Bug correction: When asked for help with -h switch, an error was displayed.
+* Bug correction: Exception occurred while generating ReleaseNotes when no release comment was provided.
+
 == 0.1.0.20091021 (Alpha)
 
 * Implemented release of libraries as well.
