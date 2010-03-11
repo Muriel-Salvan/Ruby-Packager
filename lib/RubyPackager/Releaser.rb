@@ -278,16 +278,15 @@ module RubyPackager
           "--output=#{@DocDir}/rdoc"
         ]
         # Bug (RDoc): Sometimes it does not change current directory correctly (not deterministic)
-        lOldDir = Dir.getwd
-        Dir.chdir(@ReleaseDir)
-        # First try with Muriel's template
-        begin
-          RDoc::RDoc.new.document( lRDocOptions + [ '--fmt=muriel' ] )
-        rescue Exception
-          # Then try with default template
-          RDoc::RDoc.new.document( lRDocOptions )
+        changeDir(@ReleaseDir) do
+          # First try with Muriel's template
+          begin
+            RDoc::RDoc.new.document( lRDocOptions + [ '--fmt=muriel' ] )
+          rescue Exception
+            # Then try with default template
+            RDoc::RDoc.new.document( lRDocOptions )
+          end
         end
-        Dir.chdir(lOldDir)
       end
 
       return rSuccess

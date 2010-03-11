@@ -211,20 +211,19 @@ module RubyPackager
         # list< [ CommandName, map< AttributeName, Value  > ] >
         $SSHCommands = []
         # Go to the application directory
-        lOldDir = Dir.getwd
         lAppDir = File.expand_path("#{File.dirname(__FILE__)}/Repository/#{iRepositoryName}")
-        Dir.chdir(lAppDir)
+        lRealReleaseInfoFileName = "Distribution/#{iReleaseInfoFileName}"
         # Clean the Releases dir if it exists already
         FileUtils::rm_rf("#{lAppDir}/Releases")
         # Launch everything
-        lRealReleaseInfoFileName = "Distribution/#{iReleaseInfoFileName}"
         lSuccess = nil
-        if (lIncludeRDoc)
-          lSuccess = RubyPackager::Launcher.new.run(iArguments + [ lRealReleaseInfoFileName ])
-        else
-          lSuccess = RubyPackager::Launcher.new.run(iArguments + [ '--no-rdoc', lRealReleaseInfoFileName ])
+        changeDir(lAppDir) do
+          if (lIncludeRDoc)
+            lSuccess = RubyPackager::Launcher.new.run(iArguments + [ lRealReleaseInfoFileName ])
+          else
+            lSuccess = RubyPackager::Launcher.new.run(iArguments + [ '--no-rdoc', lRealReleaseInfoFileName ])
+          end
         end
-        Dir.chdir(lOldDir)
         # Check if everything is ok
         assert(lSuccess)
         # Get the name of the directory
@@ -298,20 +297,21 @@ module RubyPackager
       def runExe(lExeFileName)
         rOutput = nil
 
-        lOldDir = Dir.getwd
-        Dir.chdir(File.dirname(lExeFileName))
-        begin
+        changeDir(File.dirname(lExeFileName)) do
           begin
             # TODO: Bug ???: On Linux, we need to "cd ." before, otherwise the executable is not found. Understand why and remove it.
-            rOutput = `cd .;#{File.basename(lExeFileName)}`
+            # TODO: Remove this code once we now what is the problem
+            require 'rUtilAnts/Platform'
+            RUtilAnts::Platform::initializePlatform
+            if $rUtilAnts_Platform_Info.os == RUBY_PLATFORM
+              rOutput = `cd .;#{File.basename(lExeFileName)}`
+            else
+              rOutput = `#{File.basename(lExeFileName)}`
+            end
           rescue Exception
             assert(false)
           end
-        rescue Exception
-          Dir.chdir(lOldDir)
-          raise
         end
-        Dir.chdir(lOldDir)
 
         return rOutput
       end
@@ -325,16 +325,15 @@ module RubyPackager
       def getGemSpec(iGemFileName)
         rGemSpec = nil
 
-        lOldDir = Dir.getwd
-        Dir.chdir(File.dirname(iGemFileName))
-        require 'rubygems'
-        # TODO: Bug (Ruby): Remove this test when Ruby will be able to deal .bat files correctly.
-        if (RUBY_PLATFORM == 'i386-mswin32')
-          rGemSpec = eval(`gem.bat specification #{File.basename(iGemFileName)} --ruby`.gsub(/Gem::/,'::Gem::'))
-        else
-          rGemSpec = eval(`gem specification #{File.basename(iGemFileName)} --ruby`.gsub(/Gem::/,'::Gem::'))
+        changeDir(File.dirname(iGemFileName)) do
+          require 'rubygems'
+          # TODO: Bug (Ruby): Remove this test when Ruby will be able to deal .bat files correctly.
+          if (RUBY_PLATFORM == 'i386-mswin32')
+            rGemSpec = eval(`gem.bat specification #{File.basename(iGemFileName)} --ruby`.gsub(/Gem::/,'::Gem::'))
+          else
+            rGemSpec = eval(`gem specification #{File.basename(iGemFileName)} --ruby`.gsub(/Gem::/,'::Gem::'))
+          end
         end
-        Dir.chdir(lOldDir)
 
         return rGemSpec
       end

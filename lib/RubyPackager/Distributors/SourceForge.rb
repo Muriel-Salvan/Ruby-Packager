@@ -93,10 +93,9 @@ module RubyPackager
       def uploadRDocOnSFNET
         logDebug 'Uploading RDoc on SF.NET ...'
         # Zip the RDoc
-        lOldDir = Dir.getwd
-        Dir.chdir(@DocDir)
-        system("zip -r rdoc.zip rdoc")
-        Dir.chdir(lOldDir)
+        changeDir(@DocDir) do
+          system("zip -r rdoc.zip rdoc")
+        end
         # Send it
         lRDocBaseDir = "/home/groups/#{@SFProjectSubPath}/htdocs/rdoc"
         sshWithPassword(

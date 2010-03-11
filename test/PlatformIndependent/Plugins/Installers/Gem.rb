@@ -49,16 +49,16 @@ module RubyPackager
                 lGemName = "#{iReleaseDir}/Installer/GemName-0.0.1.20091030.gem"
                 assert(File.exists?(lGemName))
                 # Get back the specification to check it
-                lOldDir = Dir.getwd
-                Dir.chdir(File.dirname(lGemName))
-                require 'rubygems'
-                # TODO: Bug (Ruby): gem.bat instead of gem for Windows only. Make .bat files calleable without their extension.
-                if (RUBY_PLATFORM == 'i386-mswin32')
-                  lGemSpec = eval(`gem.bat specification #{File.basename(lGemName)} --ruby`.gsub(/Gem::/,'::Gem::'))
-                else
-                  lGemSpec = eval(`gem specification #{File.basename(lGemName)} --ruby`.gsub(/Gem::/,'::Gem::'))
+                lGemSpec = nil
+                changeDir(File.dirname(lGemName)) do
+                  require 'rubygems'
+                  # TODO: Bug (Ruby): gem.bat instead of gem for Windows only. Make .bat files calleable without their extension.
+                  if (RUBY_PLATFORM == 'i386-mswin32')
+                    lGemSpec = eval(`gem.bat specification #{File.basename(lGemName)} --ruby`.gsub(/Gem::/,'::Gem::'))
+                  else
+                    lGemSpec = eval(`gem specification #{File.basename(lGemName)} --ruby`.gsub(/Gem::/,'::Gem::'))
+                  end
                 end
-                Dir.chdir(lOldDir)
                 assert_equal('GemName', lGemSpec.name)
                 assert_equal(::Gem::Version.new('0.0.1.20091030'), lGemSpec.version)
                 assert_equal(['Author:Name'], lGemSpec.authors)

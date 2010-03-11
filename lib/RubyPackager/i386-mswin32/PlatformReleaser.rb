@@ -73,19 +73,18 @@ module RubyPackager
         # First create the binary containing all ruby
         lBinDir = "#{iReleaseDir}/#{lBinSubDir}"
         FileUtils::mkdir_p(lBinDir)
-        lOldDir = Dir.getwd
-        Dir.chdir(lBinDir)
-        lCmd = nil
-        if (iReleaseInfo.ExecutableInfo[:TerminalApplication])
-          lCmd = "allinoneruby.bat #{lBinName}"
-        else
-          lCmd = "allinoneruby.bat --rubyw #{lBinName}"
+        changeDir(lBinDir) do
+          lCmd = nil
+          if (iReleaseInfo.ExecutableInfo[:TerminalApplication])
+            lCmd = "allinoneruby.bat #{lBinName}"
+          else
+            lCmd = "allinoneruby.bat --rubyw #{lBinName}"
+          end
+          rSuccess = system(lCmd)
+          if (!rSuccess)
+            logErr "Error while executing \"#{lCmd}\""
+          end
         end
-        rSuccess = system(lCmd)
-        if (!rSuccess)
-          logErr "Error while executing \"#{lCmd}\""
-        end
-        Dir.chdir(lOldDir)
       end
       if (rSuccess)
         # Then create the real executable
@@ -145,10 +144,9 @@ if (!lSuccess)
 end
 "
         end
-        lOldDir = Dir.getwd
-        Dir.chdir(iReleaseDir)
-        rSuccess = system("exerb.bat -o #{iReleaseInfo.ExecutableInfo[:ExeName]}.exe #{lTempFileName}")
-        Dir.chdir(lOldDir)
+        changeDir(iReleaseDir) do
+          rSuccess = system("exerb.bat -o #{iReleaseInfo.ExecutableInfo[:ExeName]}.exe #{lTempFileName}")
+        end
         if (rSuccess)
           File.unlink(lTempFileName)
           # And set its icon

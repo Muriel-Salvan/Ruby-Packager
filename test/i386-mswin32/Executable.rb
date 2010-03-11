@@ -23,7 +23,7 @@ module RubyPackager
             # Unless the Executable file can contain other rb files (please Crate come faster !), files are still present.
             assert(File.exists?("#{iReleaseDir}/Release/Main.rb"))
             # Test it in Ruby's environment
-            assert_equal("ruby #{RUBY_VERSION} (#{RUBY_RELEASE_DATE}) [#{RUBY_PLATFORM}]
+            assert_equal("#{getRubySignature}
 Ruby found in environment. Using it directly.
 > start rubyw -w \"#{iReleaseDir}/Release/Main.rb\" \n", runExe(lExeFileName))
             # TODO: Test it without Ruby's environment
@@ -40,7 +40,7 @@ Ruby found in environment. Using it directly.
             # Unless the Executable file can contain other rb files (please Crate come faster !), files are still present.
             assert(File.exists?("#{iReleaseDir}/Release/Main.rb"))
             # Test it in Ruby's environment
-            assert_equal("ruby #{RUBY_VERSION} (#{RUBY_RELEASE_DATE}) [#{RUBY_PLATFORM}]
+            assert_equal("#{getRubySignature}
 Ruby found in environment. Using it directly.
 > ruby -w \"#{iReleaseDir}/Release/Main.rb\" \nHello World\n", runExe(lExeFileName))
             # TODO: Test it without Ruby's environment
@@ -57,7 +57,7 @@ Ruby found in environment. Using it directly.
             # Unless the Executable file can contain other rb files (please Crate come faster !), files are still present.
             assert(File.exists?("#{iReleaseDir}/Release/Main.rb"))
             # Test it in Ruby's environment
-            assert_equal("ruby #{RUBY_VERSION} (#{RUBY_RELEASE_DATE}) [#{RUBY_PLATFORM}]
+            assert_equal("#{getRubySignature}
 Ruby found in environment. Using it directly.
 > start rubyw -w \"#{iReleaseDir}/Release/Main.rb\" \n", runExe(lExeFileName))
             # TODO: Test it without Ruby's environment
@@ -74,11 +74,28 @@ Ruby found in environment. Using it directly.
             # Unless the Executable file can contain other rb files (please Crate come faster !), files are still present.
             assert(File.exists?("#{iReleaseDir}/Release/Main.rb"))
             # Test it in Ruby's environment
-            assert_equal("ruby #{RUBY_VERSION} (#{RUBY_RELEASE_DATE}) [#{RUBY_PLATFORM}]
+            assert_equal("#{getRubySignature}
 Ruby found in environment. Using it directly.
 > ruby -w \"#{iReleaseDir}/Release/Main.rb\" \nHello World\n", runExe(lExeFileName))
             # TODO: Test it without Ruby's environment
           end
+        end
+
+        private
+
+        # Get Ruby's signature when invoked from command line
+        #
+        # Return:
+        # * _String_: Ruby's signature
+        def getRubySignature
+          lRubyReleaseInfo = nil
+          if (defined?(RUBY_PATCHLEVEL))
+            lRubyReleaseInfo = "#{RUBY_RELEASE_DATE} patchlevel #{RUBY_PATCHLEVEL}"
+          else
+            lRubyReleaseInfo = RUBY_RELEASE_DATE
+          end
+
+          return "ruby #{RUBY_VERSION} (#{lRubyReleaseInfo}) [#{RUBY_PLATFORM}]"
         end
 
       end

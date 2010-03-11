@@ -13,6 +13,8 @@
 
 require 'rUtilAnts/Logging'
 RUtilAnts::Logging::initializeLogging("#{File.dirname(__FILE__)}/..", 'http://sourceforge.net/tracker/?group_id=274236&atid=1165400')
+require 'rUtilAnts/Misc'
+RUtilAnts::Misc.initializeMisc
 
 module RubyPackager
 
@@ -36,7 +38,7 @@ module RubyPackager
         :Tags => [],
         :DevStatus => 'Unofficial'
       }
-      lReleaseInfoFileName = "#{File.dirname(FILE_PATH)}/ReleaseInfo"
+      lReleaseInfoFileName = "#{File.dirname(FILE_PATH)}/../ReleaseInfo"
       if (File.exists?(lReleaseInfoFileName))
         File.open(lReleaseInfoFileName, 'r') do |iFile|
           lRPReleaseInfo = eval(iFile.read)

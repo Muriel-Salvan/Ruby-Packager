@@ -22,47 +22,46 @@ module RubyPackager
       def createInstaller(iRootDir, iReleaseDir, iInstallerDir, iVersion, iReleaseInfo)
         rFileName = nil
 
-        lOldDir = Dir.getwd
-        Dir.chdir(iReleaseDir)
-        # 1. Generate the gemspec that will build the gem
-        lStrHasRDoc = nil
-        if (iReleaseInfo.GemInfo[:HasRDoc])
-          lStrHasRDoc = 'true'
-        else
-          lStrHasRDoc = 'false'
-        end
-        # !!! Don't use absolute paths here, otherwise they will be stored in the Gem
-        lStrFiles = "iSpec.files = [ '#{Dir.glob('**/*').join('\', \'')}' ]"
-        lStrExtraRDocFiles = ''
-        if ((iReleaseInfo.GemInfo[:ExtraRDocFiles] != nil) and
-            (!iReleaseInfo.GemInfo[:ExtraRDocFiles].empty?))
-          lStrExtraRDocFiles = "iSpec.extra_rdoc_files = [ '#{iReleaseInfo.GemInfo[:ExtraRDocFiles].join('\', \'')}' ]"
-          RubyPackager::copyFiles(iRootDir, iReleaseDir, iReleaseInfo.GemInfo[:ExtraRDocFiles])
-        end
-        lGemDepsStrList = []
-        if (iReleaseInfo.GemInfo[:GemDependencies] != nil)
-          iReleaseInfo.GemInfo[:GemDependencies].each do |iGemDepInfo|
-            iGemName, iGemVersion = iGemDepInfo
-            if (iGemVersion != nil)
-              lGemDepsStrList << "iSpec.add_dependency('#{iGemName}', '#{iGemVersion}')"
-            else
-              lGemDepsStrList << "iSpec.add_dependency('#{iGemName}')"
+        changeDir(iReleaseDir) do
+          # 1. Generate the gemspec that will build the gem
+          lStrHasRDoc = nil
+          if (iReleaseInfo.GemInfo[:HasRDoc])
+            lStrHasRDoc = 'true'
+          else
+            lStrHasRDoc = 'false'
+          end
+          # !!! Don't use absolute paths here, otherwise they will be stored in the Gem
+          lStrFiles = "iSpec.files = [ '#{Dir.glob('**/*').join('\', \'')}' ]"
+          lStrExtraRDocFiles = ''
+          if ((iReleaseInfo.GemInfo[:ExtraRDocFiles] != nil) and
+              (!iReleaseInfo.GemInfo[:ExtraRDocFiles].empty?))
+            lStrExtraRDocFiles = "iSpec.extra_rdoc_files = [ '#{iReleaseInfo.GemInfo[:ExtraRDocFiles].join('\', \'')}' ]"
+            RubyPackager::copyFiles(iRootDir, iReleaseDir, iReleaseInfo.GemInfo[:ExtraRDocFiles])
+          end
+          lGemDepsStrList = []
+          if (iReleaseInfo.GemInfo[:GemDependencies] != nil)
+            iReleaseInfo.GemInfo[:GemDependencies].each do |iGemDepInfo|
+              iGemName, iGemVersion = iGemDepInfo
+              if (iGemVersion != nil)
+                lGemDepsStrList << "iSpec.add_dependency('#{iGemName}', '#{iGemVersion}')"
+              else
+                lGemDepsStrList << "iSpec.add_dependency('#{iGemName}')"
+              end
             end
           end
-        end
-        lStrTestFile = ''
-        if (iReleaseInfo.GemInfo[:TestFile] != nil)
-          lStrTestFile = "iSpec.test_file = '#{iReleaseInfo.GemInfo[:TestFile]}'"
-        end
-        lStrBinDir = ''
-        lStrDefaultExecutable = ''
-        if (iReleaseInfo.ExecutableInfo[:StartupRBFile] != nil)
-          lStrBinDir = "iSpec.bindir = '#{File.dirname(iReleaseInfo.ExecutableInfo[:StartupRBFile])}'"
-          lStrDefaultExecutable = "iSpec.executables = [ '#{File.basename(iReleaseInfo.ExecutableInfo[:StartupRBFile])}' ]"
-        end
-        lGemSpecFileName = 'release.gemspec.rb'
-        File.open(lGemSpecFileName, 'w') do |oFile|
-          oFile << "
+          lStrTestFile = ''
+          if (iReleaseInfo.GemInfo[:TestFile] != nil)
+            lStrTestFile = "iSpec.test_file = '#{iReleaseInfo.GemInfo[:TestFile]}'"
+          end
+          lStrBinDir = ''
+          lStrDefaultExecutable = ''
+          if (iReleaseInfo.ExecutableInfo[:StartupRBFile] != nil)
+            lStrBinDir = "iSpec.bindir = '#{File.dirname(iReleaseInfo.ExecutableInfo[:StartupRBFile])}'"
+            lStrDefaultExecutable = "iSpec.executables = [ '#{File.basename(iReleaseInfo.ExecutableInfo[:StartupRBFile])}' ]"
+          end
+          lGemSpecFileName = 'release.gemspec.rb'
+          File.open(lGemSpecFileName, 'w') do |oFile|
+            oFile << "
 Gem::Specification.new do |iSpec|
   iSpec.name = '#{iReleaseInfo.GemInfo[:GemName]}'
   iSpec.version = '#{iVersion}'
@@ -83,29 +82,29 @@ Gem::Specification.new do |iSpec|
   #{lGemDepsStrList.join("\n")}
 end
 "
-        end
-        # 2. Call gem build with this gemspec
-        # Load RubyGems
-        require 'rubygems/command_manager'
-        # Build gem
-        lGemOK = true
-        begin
-          ::Gem::CommandManager.instance.find_command('build').invoke(lGemSpecFileName)
-        rescue ::Gem::SystemExitException
-          # For RubyGems, this is normal behaviour: success results in an exception thrown with exit_code 0.
-          if ($!.exit_code != 0)
-            logErr "RubyGems returned error #{$!.exit_code}."
-            lGemOK = false
+          end
+          # 2. Call gem build with this gemspec
+          # Load RubyGems
+          require 'rubygems/command_manager'
+          # Build gem
+          lGemOK = true
+          begin
+            ::Gem::CommandManager.instance.find_command('build').invoke(lGemSpecFileName)
+          rescue ::Gem::SystemExitException
+            # For RubyGems, this is normal behaviour: success results in an exception thrown with exit_code 0.
+            if ($!.exit_code != 0)
+              logErr "RubyGems returned error #{$!.exit_code}."
+              lGemOK = false
+            end
+          end
+          File.unlink(lGemSpecFileName)
+          if (lGemOK)
+            # Move the Gem to the destination directory
+            require 'fileutils'
+            rFileName = "#{iReleaseInfo.GemInfo[:GemName]}-#{iVersion}.gem"
+            FileUtils::mv(rFileName, "#{iInstallerDir}/#{rFileName}")
           end
         end
-        File.unlink(lGemSpecFileName)
-        if (lGemOK)
-          # Move the Gem to the destination directory
-          require 'fileutils'
-          rFileName = "#{iReleaseInfo.GemInfo[:GemName]}-#{iVersion}.gem"
-          FileUtils::mv(rFileName, "#{iInstallerDir}/#{rFileName}")
-        end
-        Dir.chdir(lOldDir)
 
         return rFileName
       end

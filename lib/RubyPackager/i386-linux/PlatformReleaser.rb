@@ -58,14 +58,13 @@ module RubyPackager
         # First create the binary containing all ruby
         lBinDir = "#{iReleaseDir}/#{lBinSubDir}"
         FileUtils::mkdir_p(lBinDir)
-        lOldDir = Dir.getwd
-        Dir.chdir(lBinDir)
-        lCmd = "allinoneruby #{lBinName}"
-        rSuccess = system(lCmd)
-        if (!rSuccess)
-          logErr "Error while executing \"#{lCmd}\""
+        changeDir(lBinDir) do
+          lCmd = "allinoneruby #{lBinName}"
+          rSuccess = system(lCmd)
+          if (!rSuccess)
+            logErr "Error while executing \"#{lCmd}\""
+          end
         end
-        Dir.chdir(lOldDir)
       end
       if (rSuccess)
         # Then create the real executable
