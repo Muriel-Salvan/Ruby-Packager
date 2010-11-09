@@ -17,7 +17,7 @@ RubyPackager::ReleaseInfo.new.
     :ImageURL => 'http://rubypackager.sourceforge.net/wiki/images/c/c9/Logo.png',
     :FaviconURL => 'http://rubypackager.sourceforge.net/wiki/images/2/26/Favicon.png',
     :SVNBrowseURL => 'http://rubypackager.svn.sourceforge.net/viewvc/rubypackager/',
-    :DevStatus => 'Alpha'
+    :DevStatus => 'Beta'
   ).
   addCoreFiles( [
     '{lib,bin}/**/*'
