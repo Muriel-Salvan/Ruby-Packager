@@ -17,9 +17,10 @@ module RubyPackager
       # * *iInstallerDir* (_String_): The directory where the installer has to be put
       # * *iVersion* (_String_): Release version
       # * *iReleaseInfo* (_ReleaseInfo_): Release info
+      # * *iIncludeTest* (_Boolean_): Are test files part of the release ?
       # Return:
       # * _String_: File name to distribute, or nil in case of failure
-      def createInstaller(iRootDir, iReleaseDir, iInstallerDir, iVersion, iReleaseInfo)
+      def createInstaller(iRootDir, iReleaseDir, iInstallerDir, iVersion, iReleaseInfo, iIncludeTest)
         rFileName = nil
 
         changeDir(iReleaseDir) do
@@ -50,7 +51,8 @@ module RubyPackager
             end
           end
           lStrTestFile = ''
-          if (iReleaseInfo.GemInfo[:TestFile] != nil)
+          if ((iIncludeTest) and
+              (iReleaseInfo.GemInfo[:TestFile] != nil))
             lStrTestFile = "iSpec.test_file = '#{iReleaseInfo.GemInfo[:TestFile]}'"
           end
           # Compute the list of executable files and the executable directory
@@ -128,8 +130,13 @@ end
             if (lGemOK)
               # Move the Gem to the destination directory
               require 'fileutils'
-              rFileName = "#{iReleaseInfo.GemInfo[:GemName]}-#{iVersion}.gem"
-              FileUtils::mv(rFileName, "#{iInstallerDir}/#{rFileName}")
+              # Find the name of the Gem: it can differ depending on the platform
+              rFileName = Dir.glob("#{iReleaseInfo.GemInfo[:GemName]}-#{iVersion}*.gem")[0]
+              if (rFileName == nil)
+                logErr "Unable to find generated gem \"#{iReleaseInfo.GemInfo[:GemName]}-#{iVersion}*.gem\""
+              else
+                FileUtils::mv(rFileName, "#{iInstallerDir}/#{rFileName}")
+              end
             end
           end
         end

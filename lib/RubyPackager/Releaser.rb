@@ -146,7 +146,7 @@ module RubyPackager
                 @Installers.each do |iInstallerName|
                   logOp("Create installer #{iInstallerName}") do
                     @PluginsManager.accessPlugin('Installers', iInstallerName) do |ioPlugin|
-                      lFileName = ioPlugin.createInstaller(@RootDir, @ReleaseDir, @InstallerDir, @ReleaseVersion, @ReleaseInfo)
+                      lFileName = ioPlugin.createInstaller(@RootDir, @ReleaseDir, @InstallerDir, @ReleaseVersion, @ReleaseInfo, @IncludeTest)
                       if (lFileName == nil)
                         rSuccess = false
                       else
