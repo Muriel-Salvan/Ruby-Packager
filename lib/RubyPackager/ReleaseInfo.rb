@@ -1,5 +1,5 @@
 #--
-# Copyright (c) 2009 Muriel Salvan (murielsalvan@users.sourceforge.net)
+# Copyright (c) 2009-2010 Muriel Salvan (murielsalvan@users.sourceforge.net)
 # Licensed under the terms specified in LICENSE file. No warranty is provided.
 #++
 
@@ -16,9 +16,9 @@ module RubyPackager
     #   map< Symbol, Object >
     attr_reader :ProjectInfo
 
-    # Information about the executable
-    #   map< Symbol, Object >
-    attr_reader :ExecutableInfo
+    # Information about the executables
+    #   list< map< Symbol, Object > >
+    attr_reader :ExecutablesInfo
 
     # Information about the installer
     #   map< Symbol, Object >
@@ -53,7 +53,7 @@ module RubyPackager
       # This sets also default values
       @AuthorInfo = {}
       @ProjectInfo = {}
-      @ExecutableInfo = {}
+      @ExecutablesInfo = []
       @InstallInfo = {}
       @SFInfo = {}
       @RFInfo = {}
@@ -99,7 +99,8 @@ module RubyPackager
       return self
     end
 
-    # Add executable package properties
+    # Add executable package properties.
+    # This method can be called several times to specify several executables.
     #
     # Parameters:
     # * *iParams* (<em>map<Symbol,Object></em>): The parameters:
@@ -110,7 +111,7 @@ module RubyPackager
     # Return:
     # * _ReleaseInfo_: self
     def executable(iParams)
-      @ExecutableInfo.merge!(iParams)
+      @ExecutablesInfo << iParams
 
       return self
     end
@@ -163,7 +164,8 @@ module RubyPackager
     # * *iParams* (<em>map<Symbol,Object></em>): The parameters:
     # ** *:GemName* (_String_): The Gem name
     # ** *:GemPlatformClassName* (_String_): The name of the Gem platform class
-    # ** *:RequirePath* (_String_): Path to require
+    # ** *:RequirePath* (_String_): Single path to require
+    # ** *:RequirePaths* (<em>list<String></em>): Paths to require
     # ** *:HasRDoc* (_String_): Include RDoc in the Gem ?
     # ** *:ExtraRDocFiles* (<em>list<String></em>): List of file patterns to be included in the RDoc but not in the Gem
     # ** *:TestFile* (_String_): Name of the test file to execute

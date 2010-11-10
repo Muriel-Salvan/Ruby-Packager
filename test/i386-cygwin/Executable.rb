@@ -7,7 +7,7 @@ module RubyPackager
 
   module Test
 
-    module I386MSWin32
+    module I386Cygwin
 
       class Executable < ::Test::Unit::TestCase
 
@@ -18,14 +18,13 @@ module RubyPackager
           execTest('Applications/Basic', [], 'ReleaseInfo_Exe.rb') do |iReleaseDir, iReleaseInfo|
             checkReleaseInfo(iReleaseDir, iReleaseInfo)
             checkReleaseNotes(iReleaseDir, iReleaseInfo)
-            lExeFileName = "#{iReleaseDir}/Release/ExeName.exe"
+            lExeFileName = "#{iReleaseDir}/Release/ExeName"
             assert(File.exists?(lExeFileName))
             # Unless the Executable file can contain other rb files (please Crate come faster !), files are still present.
             assert(File.exists?("#{iReleaseDir}/Release/Main.rb"))
             # Test it in Ruby's environment
-            assert_equal("#{getRubySignature}
-Ruby found in environment. Using it directly.
-> start rubyw -w \"#{iReleaseDir}/Release/Main.rb\" \n", runExe(lExeFileName))
+            assert_equal("Ruby found on current platform. Use it directly.
+Hello World\n", runExe(lExeFileName))
             # TODO: Test it without Ruby's environment
           end
         end
@@ -35,14 +34,13 @@ Ruby found in environment. Using it directly.
           execTest('Applications/Basic', [], 'ReleaseInfo_ExeTerm.rb') do |iReleaseDir, iReleaseInfo|
             checkReleaseInfo(iReleaseDir, iReleaseInfo)
             checkReleaseNotes(iReleaseDir, iReleaseInfo)
-            lExeFileName = "#{iReleaseDir}/Release/ExeName.exe"
+            lExeFileName = "#{iReleaseDir}/Release/ExeName"
             assert(File.exists?(lExeFileName))
             # Unless the Executable file can contain other rb files (please Crate come faster !), files are still present.
             assert(File.exists?("#{iReleaseDir}/Release/Main.rb"))
             # Test it in Ruby's environment
-            assert_equal("#{getRubySignature}
-Ruby found in environment. Using it directly.
-> ruby -w \"#{iReleaseDir}/Release/Main.rb\" \nHello World\n", runExe(lExeFileName))
+            assert_equal("Ruby found on current platform. Use it directly.
+Hello World\n", runExe(lExeFileName))
             # TODO: Test it without Ruby's environment
           end
         end
@@ -52,14 +50,13 @@ Ruby found in environment. Using it directly.
           execTest('Applications/Basic', [ '-r' ], 'ReleaseInfo_Exe.rb') do |iReleaseDir, iReleaseInfo|
             checkReleaseInfo(iReleaseDir, iReleaseInfo)
             checkReleaseNotes(iReleaseDir, iReleaseInfo)
-            lExeFileName = "#{iReleaseDir}/Release/ExeName.exe"
+            lExeFileName = "#{iReleaseDir}/Release/ExeName"
             assert(File.exists?(lExeFileName))
             # Unless the Executable file can contain other rb files (please Crate come faster !), files are still present.
             assert(File.exists?("#{iReleaseDir}/Release/Main.rb"))
             # Test it in Ruby's environment
-            assert_equal("#{getRubySignature}
-Ruby found in environment. Using it directly.
-> start rubyw -w \"#{iReleaseDir}/Release/Main.rb\" \n", runExe(lExeFileName))
+            assert_equal("Ruby found on current platform. Use it directly.
+Hello World\n", runExe(lExeFileName))
             # TODO: Test it without Ruby's environment
           end
         end
@@ -69,33 +66,15 @@ Ruby found in environment. Using it directly.
           execTest('Applications/Basic', [ '-r' ], 'ReleaseInfo_ExeTerm.rb') do |iReleaseDir, iReleaseInfo|
             checkReleaseInfo(iReleaseDir, iReleaseInfo)
             checkReleaseNotes(iReleaseDir, iReleaseInfo)
-            lExeFileName = "#{iReleaseDir}/Release/ExeName.exe"
+            lExeFileName = "#{iReleaseDir}/Release/ExeName"
             assert(File.exists?(lExeFileName))
             # Unless the Executable file can contain other rb files (please Crate come faster !), files are still present.
             assert(File.exists?("#{iReleaseDir}/Release/Main.rb"))
             # Test it in Ruby's environment
-            assert_equal("#{getRubySignature}
-Ruby found in environment. Using it directly.
-> ruby -w \"#{iReleaseDir}/Release/Main.rb\" \nHello World\n", runExe(lExeFileName))
+            assert_equal("Ruby found on current platform. Use it directly.
+Hello World\n", runExe(lExeFileName))
             # TODO: Test it without Ruby's environment
           end
-        end
-
-        private
-
-        # Get Ruby's signature when invoked from command line
-        #
-        # Return:
-        # * _String_: Ruby's signature
-        def getRubySignature
-          lRubyReleaseInfo = nil
-          if (defined?(RUBY_PATCHLEVEL))
-            lRubyReleaseInfo = "#{RUBY_RELEASE_DATE} patchlevel #{RUBY_PATCHLEVEL}"
-          else
-            lRubyReleaseInfo = RUBY_RELEASE_DATE
-          end
-
-          return "ruby #{RUBY_VERSION} (#{lRubyReleaseInfo}) [#{RUBY_PLATFORM}]"
         end
 
       end

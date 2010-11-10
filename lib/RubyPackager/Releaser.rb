@@ -1,5 +1,5 @@
 #--
-# Copyright (c) 2009 Muriel Salvan (murielsalvan@users.sourceforge.net)
+# Copyright (c) 2009-2010 Muriel Salvan (murielsalvan@users.sourceforge.net)
 # Licensed under the terms specified in LICENSE file. No warranty is provided.
 #++
 
@@ -102,7 +102,7 @@ module RubyPackager
             (!@ReleaseInfo.checkReadyForRelease(@RootDir)))
           rSuccess = false
         end
-        if (@ReleaseInfo.ExecutableInfo[:ExeName] != nil)
+        if (!@ReleaseInfo.ExecutablesInfo.empty?)
           # Check tools for platform dependent considerations
           if (!@PlatformReleaseInfo.checkExeTools(@RootDir, @IncludeRuby))
             rSuccess = false
@@ -217,11 +217,13 @@ module RubyPackager
 "
         end
       end
-      if (@ReleaseInfo.ExecutableInfo[:ExeName] != nil)
-        logOp('Create binary') do
-          # TODO (crate): When crate will work correctly under Windows, use it here to pack everything
-          # For now the executable creation is platform dependent
-          rSuccess = @PlatformReleaseInfo.createBinary(@RootDir, @ReleaseDir, @IncludeRuby, @ReleaseInfo)
+      @ReleaseInfo.ExecutablesInfo.each do |iExecutableInfo|
+        if (iExecutableInfo[:ExeName] != nil)
+          logOp("Create binary #{iExecutableInfo[:ExeName]}") do
+            # TODO (crate): When crate will work correctly under Windows, use it here to pack everything
+            # For now the executable creation is platform dependent
+            rSuccess = @PlatformReleaseInfo.createBinary(@RootDir, @ReleaseDir, @IncludeRuby, iExecutableInfo)
+          end
         end
       end
       if (rSuccess)

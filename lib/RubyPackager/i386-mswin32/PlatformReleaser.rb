@@ -1,5 +1,5 @@
 #--
-# Copyright (c) 2009 Muriel Salvan (murielsalvan@users.sourceforge.net)
+# Copyright (c) 2009-2010 Muriel Salvan (murielsalvan@users.sourceforge.net)
 # Licensed under the terms specified in LICENSE file. No warranty is provided.
 #++
 
@@ -52,16 +52,16 @@ module RubyPackager
     # * *iRootDir* (_String_): Root directory
     # * *iReleaseDir* (_String_): Release directory
     # * *iIncludeRuby* (_Boolean_): Do we include Ruby in the release ?
-    # * *iReleaseInfo* (_ReleaseInfo_): The release information
+    # * *iExecutableInfo* (<em>map<Symbol,Object></em>): The executable information
     # Return:
     # * _Boolean_: Success ?
-    def createBinary(iRootDir, iReleaseDir, iIncludeRuby, iReleaseInfo)
+    def createBinary(iRootDir, iReleaseDir, iIncludeRuby, iExecutableInfo)
       rSuccess = true
 
       lBinSubDir = "Launch/#{RUBY_PLATFORM}/bin"
       lRubyBaseBinName = nil
       lRubyLaunchCmd = nil
-      if (iReleaseInfo.ExecutableInfo[:TerminalApplication])
+      if (iExecutableInfo[:TerminalApplication])
         lRubyBaseBinName = 'ruby'
         lRubyLaunchCmd = 'ruby'
       else
@@ -75,7 +75,7 @@ module RubyPackager
         FileUtils::mkdir_p(lBinDir)
         changeDir(lBinDir) do
           lCmd = nil
-          if (iReleaseInfo.ExecutableInfo[:TerminalApplication])
+          if (iExecutableInfo[:TerminalApplication])
             lCmd = "allinoneruby.bat #{lBinName}"
           else
             lCmd = "allinoneruby.bat --rubyw #{lBinName}"
@@ -93,7 +93,7 @@ module RubyPackager
         File.open(lTempFileName, 'w') do |oFile|
           oFile << "
 \#--
-\# Copyright (c) 2009 Muriel Salvan (murielsalvan@users.sourceforge.net)
+\# Copyright (c) 2009-2010 Muriel Salvan (murielsalvan@users.sourceforge.net)
 \# Licensed under the terms specified in LICENSE file. No warranty is provided.
 \#++
 
@@ -130,12 +130,12 @@ lCurrentDir = Dir.getwd
 if (system('#{lRubyBaseBinName} --version'))
   \# Launch directly
   puts \"Ruby found in environment. Using it directly.\"
-  lSuccess = RubyPackager::shellExecute(\"#{lRubyLaunchCmd} -w \\\"\#{lCurrentDir}/#{iReleaseInfo.ExecutableInfo[:StartupRBFile]}\\\" \#{ARGV.join(' ')}\")
+  lSuccess = RubyPackager::shellExecute(\"#{lRubyLaunchCmd} -w \\\"\#{lCurrentDir}/#{iExecutableInfo[:StartupRBFile]}\\\" \#{ARGV.join(' ')}\")
 end
 if (!lSuccess)
   \# Use allinoneruby
   puts \"Ruby not found in environment. Using shipped Ruby.\"
-  lSuccess = RubyPackager::shellExecute(\"start \\\"Title\\\" \\\"\#{lCurrentDir}/#{lBinSubDir}/#{lBinName}\\\" \\\"\#{lCurrentDir}/#{iReleaseInfo.ExecutableInfo[:StartupRBFile]}\\\" \#{ARGV.join(' ')}\")
+  lSuccess = RubyPackager::shellExecute(\"start \\\"Title\\\" \\\"\#{lCurrentDir}/#{lBinSubDir}/#{lBinName}\\\" \\\"\#{lCurrentDir}/#{iExecutableInfo[:StartupRBFile]}\\\" \#{ARGV.join(' ')}\")
   if (!lSuccess)
     puts 'Unable to execute the application. Please reinstall it.'
     puts 'Hit enter to quit.'
@@ -145,18 +145,18 @@ end
 "
         end
         changeDir(iReleaseDir) do
-          rSuccess = system("exerb.bat -o #{iReleaseInfo.ExecutableInfo[:ExeName]}.exe #{lTempFileName}")
+          rSuccess = system("exerb.bat -o #{iExecutableInfo[:ExeName]}.exe #{lTempFileName}")
         end
         if (rSuccess)
           File.unlink(lTempFileName)
           # And set its icon
-          lEdiconCmd = "#{PLATFORM_DIR}/edicon/edicon.exe #{iReleaseDir}/#{iReleaseInfo.ExecutableInfo[:ExeName]}.exe #{iRootDir}/#{iReleaseInfo.ExecutableInfo[:IconName]}"
+          lEdiconCmd = "#{PLATFORM_DIR}/edicon/edicon.exe #{iReleaseDir}/#{iExecutableInfo[:ExeName]}.exe #{iRootDir}/#{iExecutableInfo[:IconName]}"
           rSuccess = system(lEdiconCmd)
           if (!rSuccess)
             logErr "Error while executing \"#{lEdiconCmd}\""
           end
         else
-          logErr "Error while executing \"exerb.bat -o #{iReleaseInfo.ExecutableInfo[:ExeName]}.exe #{lTempFileName}\""
+          logErr "Error while executing \"exerb.bat -o #{iExecutableInfo[:ExeName]}.exe #{lTempFileName}\""
         end
       end
 

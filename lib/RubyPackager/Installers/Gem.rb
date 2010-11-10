@@ -1,5 +1,5 @@
 #--
-# Copyright (c) 2009 Muriel Salvan (murielsalvan@users.sourceforge.net)
+# Copyright (c) 2009-2010 Muriel Salvan (murielsalvan@users.sourceforge.net)
 # Licensed under the terms specified in LICENSE file. No warranty is provided.
 #++
 
@@ -53,15 +53,42 @@ module RubyPackager
           if (iReleaseInfo.GemInfo[:TestFile] != nil)
             lStrTestFile = "iSpec.test_file = '#{iReleaseInfo.GemInfo[:TestFile]}'"
           end
-          lStrBinDir = ''
-          lStrDefaultExecutable = ''
-          if (iReleaseInfo.ExecutableInfo[:StartupRBFile] != nil)
-            lStrBinDir = "iSpec.bindir = '#{File.dirname(iReleaseInfo.ExecutableInfo[:StartupRBFile])}'"
-            lStrDefaultExecutable = "iSpec.executables = [ '#{File.basename(iReleaseInfo.ExecutableInfo[:StartupRBFile])}' ]"
+          # Compute the list of executable files and the executable directory
+          lBinError = false
+          lExecutablesDir = nil
+          lExecutablesBase = []
+          iReleaseInfo.ExecutablesInfo.each do |iExecutableInfo|
+            if (lExecutablesDir == nil)
+              lExecutablesDir = File.dirname(iExecutableInfo[:StartupRBFile])
+            elsif (lExecutablesDir != File.dirname(iExecutableInfo[:StartupRBFile]))
+              # Error
+              logErr "Executables should be all in the same directory. \"#{lExecutablesDir}\" and \"#{File.dirname(iExecutableInfo[:StartupRBFile])}\" are different directories."
+              lBinError = true
+            end
+            lExecutablesBase << File.basename(iExecutableInfo[:StartupRBFile])
           end
-          lGemSpecFileName = 'release.gemspec.rb'
-          File.open(lGemSpecFileName, 'w') do |oFile|
-            oFile << "
+          if (!lBinError)
+            lStrBinDir = ''
+            lStrExecutables = ''
+            if (lExecutablesDir != nil)
+              lStrBinDir = "iSpec.bindir = '#{lExecutablesDir}'"
+              lStrExecutables = "iSpec.executables = #{lExecutablesBase.inspect}"
+            end
+            # Compute require paths
+            lRequirePaths = []
+            if (iReleaseInfo.GemInfo[:RequirePath] != nil)
+              lRequirePaths = [ iReleaseInfo.GemInfo[:RequirePath] ]
+            end
+            if (iReleaseInfo.GemInfo[:RequirePaths] != nil)
+              lRequirePaths.concat(iReleaseInfo.GemInfo[:RequirePaths])
+            end
+            lStrRequirePaths = 'iSpec.require_path = \'\''
+            if (!lRequirePaths.empty?)
+              lStrRequirePaths = "iSpec.require_paths = #{lRequirePaths.inspect}"
+            end
+            lGemSpecFileName = 'release.gemspec.rb'
+            File.open(lGemSpecFileName, 'w') do |oFile|
+              oFile << "
 Gem::Specification.new do |iSpec|
   iSpec.name = '#{iReleaseInfo.GemInfo[:GemName]}'
   iSpec.version = '#{iVersion}'
@@ -72,37 +99,38 @@ Gem::Specification.new do |iSpec|
   iSpec.summary = '#{iReleaseInfo.ProjectInfo[:Summary].gsub(/'/,'\\\\\'')}'
   iSpec.description = '#{iReleaseInfo.ProjectInfo[:Description].gsub(/'/,'\\\\\'')}'
   #{lStrFiles}
-  iSpec.require_path = '#{iReleaseInfo.GemInfo[:RequirePath]}'
+  #{lStrRequirePaths}
   iSpec.has_rdoc = #{lStrHasRDoc}
   #{lStrExtraRDocFiles}
   iSpec.rubyforge_project = '#{iReleaseInfo.RFInfo[:ProjectUnixName]}'
   #{lStrTestFile}
   #{lStrBinDir}
-  #{lStrDefaultExecutable}
+  #{lStrExecutables}
   #{lGemDepsStrList.join("\n")}
 end
 "
-          end
-          # 2. Call gem build with this gemspec
-          # Load RubyGems
-          require 'rubygems/command_manager'
-          # Build gem
-          lGemOK = true
-          begin
-            ::Gem::CommandManager.instance.find_command('build').invoke(lGemSpecFileName)
-          rescue ::Gem::SystemExitException
-            # For RubyGems, this is normal behaviour: success results in an exception thrown with exit_code 0.
-            if ($!.exit_code != 0)
-              logErr "RubyGems returned error #{$!.exit_code}."
-              lGemOK = false
             end
-          end
-          File.unlink(lGemSpecFileName)
-          if (lGemOK)
-            # Move the Gem to the destination directory
-            require 'fileutils'
-            rFileName = "#{iReleaseInfo.GemInfo[:GemName]}-#{iVersion}.gem"
-            FileUtils::mv(rFileName, "#{iInstallerDir}/#{rFileName}")
+            # 2. Call gem build with this gemspec
+            # Load RubyGems
+            require 'rubygems/command_manager'
+            # Build gem
+            lGemOK = true
+            begin
+              ::Gem::CommandManager.instance.find_command('build').invoke(lGemSpecFileName)
+            rescue ::Gem::SystemExitException
+              # For RubyGems, this is normal behaviour: success results in an exception thrown with exit_code 0.
+              if ($!.exit_code != 0)
+                logErr "RubyGems returned error #{$!.exit_code}."
+                lGemOK = false
+              end
+            end
+            File.unlink(lGemSpecFileName)
+            if (lGemOK)
+              # Move the Gem to the destination directory
+              require 'fileutils'
+              rFileName = "#{iReleaseInfo.GemInfo[:GemName]}-#{iVersion}.gem"
+              FileUtils::mv(rFileName, "#{iInstallerDir}/#{rFileName}")
+            end
           end
         end
 

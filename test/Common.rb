@@ -1,5 +1,5 @@
 #--
-# Copyright (c) 2009 Muriel Salvan (murielsalvan@users.sourceforge.net)
+# Copyright (c) 2009-2010 Muriel Salvan (murielsalvan@users.sourceforge.net)
 # Licensed under the terms specified in LICENSE file. No warranty is provided.
 #++
 
@@ -9,6 +9,8 @@ require 'rUtilAnts/Plugins'
 require 'RubyPackager/Tools'
 # Mute everything except errors
 RUtilAnts::Logging::initializeLogging(File.dirname(__FILE__), 'http://sourceforge.net/tracker/?group_id=274236&atid=1165400', true)
+#RUtilAnts::Logging::initializeLogging(File.dirname(__FILE__), 'http://sourceforge.net/tracker/?group_id=274236&atid=1165400', false)
+#activateLogDebug(true)
 
 # Bypass the creation of any PluginsManager to include our dummy plugins automatically
 module RUtilAnts

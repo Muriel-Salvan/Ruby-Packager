@@ -13,3 +13,4 @@
 ** Make rdoc modifications part of a real Gem or an RDoc improvement.
 ** Use RDI in checkContext methods.
 ** As it is possible to have many failures when delivering or generating installers, and as generating executables and documentation is a long process, it should be better to reuse partially generated content.
+** Delivering a Gem has to be done using "gem push" with a RubyGems.org account info.
