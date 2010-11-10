@@ -1,5 +1,33 @@
 = RubyPackager Release History
 
+== 0.2.0.20101110 (Beta)
+
+=== Misc
+
+* Changed DevStatus to Beta.
+* Updated Copyright information.
+* Used rUtilAnts' changeDir.
+
+=== New features
+
+* Release files can now specify several executables to be considered.
+* Release files can now specify several require paths to be considered using :RequirePaths
+
+=== API changes
+
+* API change for Installer plugins: added parameter to know if test files are part of the release.
+* Changed API for plugins generating executables: executable info is given instead of all info.
+* Changed API for plugins getting executables information: :ExecutableInfo replaced by :ExecutablesInfo, giving a list of executables info.
+
+=== Bug corrections
+
+* Bug correction: Gem Installer: Unable to release a gem without test files if test files were declared in the release info.
+* Bug correction: Gem Installer: Unable to release a gem with a platform other than Ruby.
+* Bug correction: Executables generated for Linux did not run.
+* Bug correction: Read ReleaseInfo from its correct location.
+* Bug correction: Running executables on Windows did not work sometimes.
+* Bug correction: When Ruby version did include a patch level, output of Ruby was expected incorrectly.
+
 == 0.1.1.20091105 (Alpha)
 
 === New features
