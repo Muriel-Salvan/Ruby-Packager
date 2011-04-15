@@ -1,5 +1,5 @@
 #--
-# Copyright (c) 2009-2010 Muriel Salvan (murielsalvan@users.sourceforge.net)
+# Copyright (c) 2009 - 2011 Muriel Salvan (murielsalvan@users.sourceforge.net)
 # Licensed under the terms specified in LICENSE file. No warranty is provided.
 #++
 
@@ -84,6 +84,7 @@ module RubyPackager
     module Common
 
       class DummyInstaller1
+
         # Create the installer with everything in the release directory.
         #
         # Parameters:
@@ -92,9 +93,10 @@ module RubyPackager
         # * *iInstallerDir* (_String_): The directory where the installer has to be put
         # * *iVersion* (_String_): Release version
         # * *iReleaseInfo* (_ReleaseInfo_): Release info
+        # * *iIncludeTest* (_Boolean_): Are test files part of the release ?
         # Return:
         # * _String_: File name to distribute, or nil in case of failure
-        def createInstaller(iRootDir, iReleaseDir, iInstallerDir, iVersion, iReleaseInfo)
+        def createInstaller(iRootDir, iReleaseDir, iInstallerDir, iVersion, iReleaseInfo, iIncludeTest)
           rFileName = nil
 
           Dir.glob("#{iReleaseDir}/*").each do |iFileName|
@@ -110,6 +112,7 @@ module RubyPackager
       end
 
       class DummyInstaller2
+
         # Create the installer with everything in the release directory.
         #
         # Parameters:
@@ -118,9 +121,10 @@ module RubyPackager
         # * *iInstallerDir* (_String_): The directory where the installer has to be put
         # * *iVersion* (_String_): Release version
         # * *iReleaseInfo* (_ReleaseInfo_): Release info
+        # * *iIncludeTest* (_Boolean_): Are test files part of the release ?
         # Return:
         # * _String_: File name to distribute, or nil in case of failure
-        def createInstaller(iRootDir, iReleaseDir, iInstallerDir, iVersion, iReleaseInfo)
+        def createInstaller(iRootDir, iReleaseDir, iInstallerDir, iVersion, iReleaseInfo, iIncludeTest)
           rFileName = nil
 
           Dir.glob("#{iReleaseDir}/*").each do |iFileName|

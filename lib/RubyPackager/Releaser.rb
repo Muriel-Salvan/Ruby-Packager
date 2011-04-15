@@ -1,5 +1,6 @@
+# coding: utf-8
 #--
-# Copyright (c) 2009-2010 Muriel Salvan (murielsalvan@users.sourceforge.net)
+# Copyright (c) 2009 - 2011 Muriel Salvan (murielsalvan@users.sourceforge.net)
 # Licensed under the terms specified in LICENSE file. No warranty is provided.
 #++
 
@@ -266,6 +267,10 @@ module RubyPackager
           # For the documentation, the Root dir is the Release dir as files have been copied there and the rdoc will be generated from there.
           :RootDir => @ReleaseDir
         }
+        # Create the created.rid file as otherwise rdoc will not finish
+        FileUtils::mkdir_p("#{@DocDir}/rdoc")
+        File.open("#{@DocDir}/rdoc/created.rid", 'w') do |oFile|
+        end
         gem 'rdoc'
         require 'rdoc/rdoc'
         lRDocOptions = [
@@ -273,10 +278,13 @@ module RubyPackager
           '--tab-width=2',
           "--title=#{@ReleaseInfo.ProjectInfo[:Name].gsub(/'/,'\\\\\'')} v#{@ReleaseVersion}",
           '--fileboxes',
+          '--charset=utf-8',
           '--exclude=.svn',
+          '--exclude=.git',
           '--exclude=nbproject',
           '--exclude=Done.txt',
-          "--exclude=Releases",
+          '--exclude=Releases',
+          '--force-update',
           "--output=#{@DocDir}/rdoc"
         ]
         # Bug (RDoc): Sometimes it does not change current directory correctly (not deterministic)
@@ -285,6 +293,7 @@ module RubyPackager
           begin
             RDoc::RDoc.new.document( lRDocOptions + [ '--fmt=muriel' ] )
           rescue Exception
+            logWarn "Exception while generating using Muriel's templates: #{$!}: #{$!.backtrace.join("\n")}"
             # Then try with default template
             RDoc::RDoc.new.document( lRDocOptions )
           end
