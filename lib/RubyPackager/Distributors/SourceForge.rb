@@ -54,9 +54,8 @@ module RubyPackager
         rSuccess = true
 
         @InstallerDir, @ReleaseVersion, @ReleaseInfo, @GeneratedFileNames, @DocDir = iInstallerDir, iReleaseVersion, iReleaseInfo, iGeneratedFileNames, iDocDir
-        @SFProjectSubPath = "#{@ReleaseInfo.SFInfo[:ProjectUnixName][0..0]}/#{@ReleaseInfo.SFInfo[:ProjectUnixName][0..1]}/#{@ReleaseInfo.SFInfo[:ProjectUnixName]}"
         @SFLogin = "#{@ReleaseInfo.SFInfo[:Login]},#{@ReleaseInfo.SFInfo[:ProjectUnixName]}"
-        @SFReleaseDir = "/home/frs/project/#{@SFProjectSubPath}/#{@ReleaseVersion}"
+        @SFReleaseDir = "/home/frs/project/#{@ReleaseInfo.SFInfo[:ProjectUnixName][0..0]}/#{@ReleaseInfo.SFInfo[:ProjectUnixName][0..1]}/#{@ReleaseInfo.SFInfo[:ProjectUnixName]}/#{@ReleaseVersion}"
         createSFShell
         createReleaseOnSFNET
         # It is possible that the RDoc has not been generated
@@ -97,7 +96,7 @@ module RubyPackager
           system("zip -r rdoc.zip rdoc")
         end
         # Send it
-        lRDocBaseDir = "/home/groups/#{@SFProjectSubPath}/htdocs/rdoc"
+        lRDocBaseDir = "/home/project-web/#{@ReleaseInfo.SFInfo[:ProjectUnixName]}/htdocs/rdoc"
         sshWithPassword(
           'shell.sourceforge.net',
           @SFLogin,
