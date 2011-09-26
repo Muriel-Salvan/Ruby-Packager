@@ -45,7 +45,7 @@ module RubyPackager
                 checkRDoc(iReleaseDir, iReleaseInfo)
                 assert(File.exists?("#{iReleaseDir}/Release/MainLib.rb"))
                 assert(File.exists?("#{iReleaseDir}/Installer/MainLib.rb.Installer1"))
-                lRDocBaseDir = '/home/groups/u/un/unixname/htdocs/rdoc'
+                lRDocBaseDir = '/home/project-web/unixname/htdocs/rdoc'
                 assert_equal( [
                   [ 'SSH', { :Host => 'shell.sourceforge.net', :Login => 'login,unixname',
                     :Cmd => 'create' } ],
