@@ -1,5 +1,5 @@
 #--
-# Copyright (c) 2009 - 2011 Muriel Salvan (murielsalvan@users.sourceforge.net)
+# Copyright (c) 2009 - 2012 Muriel Salvan (muriel@x-aeon.com)
 # Licensed under the terms specified in LICENSE file. No warranty is provided.
 #++
 
@@ -16,18 +16,18 @@ module RubyPackager
 
     # Check if the tools we will use to generate an executable are present
     #
-    # Parameters:
+    # Parameters::
     # * *iRootDir* (_String_): Root directory
     # * *iIncludeRuby* (_Boolean_): Do we include Ruby in the release ?
-    # Return:
+    # Return::
     # * _Boolean_: Are tools correctly useable ?
-    def checkExeTools(iRootDir, iIncludeRuby)
+    def check_exe_tools(iRootDir, iIncludeRuby)
       rSuccess = true
 
       if (iIncludeRuby)
         # We need allinoneruby
         if (Gem.find_files('allinoneruby').empty?)
-          logErr "Need to have allinoneruby gem to release including Ruby.\nPlease install allinoneruby gem (gem install allinoneruby)."
+          log_err "Need to have allinoneruby gem to release including Ruby.\nPlease install allinoneruby gem (gem install allinoneruby)."
           rSuccess = false
         end
       end
@@ -38,14 +38,14 @@ module RubyPackager
     # Create the binary.
     # This is called when the core library has been copied in the release directory.
     #
-    # Parameters:
+    # Parameters::
     # * *iRootDir* (_String_): Root directory
     # * *iReleaseDir* (_String_): Release directory
     # * *iIncludeRuby* (_Boolean_): Do we include Ruby in the release ?
     # * *iExecutableInfo* (<em>map<Symbol,Object></em>): The executable information
-    # Return:
+    # Return::
     # * _Boolean_: Success ?
-    def createBinary(iRootDir, iReleaseDir, iIncludeRuby, iExecutableInfo)
+    def create_binary(iRootDir, iReleaseDir, iIncludeRuby, iExecutableInfo)
       rSuccess = true
 
       lBinSubDir = "Launch/#{RUBY_PLATFORM}/bin"
@@ -55,11 +55,11 @@ module RubyPackager
         # First create the binary containing all ruby
         lBinDir = "#{iReleaseDir}/#{lBinSubDir}"
         FileUtils::mkdir_p(lBinDir)
-        changeDir(lBinDir) do
+        change_dir(lBinDir) do
           lCmd = "allinoneruby #{lBinName}"
           rSuccess = system(lCmd)
           if (!rSuccess)
-            logErr "Error while executing \"#{lCmd}\""
+            log_err "Error while executing \"#{lCmd}\""
           end
         end
       end
@@ -69,7 +69,7 @@ module RubyPackager
         File.open("#{iReleaseDir}/#{iExecutableInfo[:ExeName]}", 'w') do |oFile|
           oFile << "\#!/bin/sh
 \#--
-\# Copyright (c) 2009 - 2011 Muriel Salvan (murielsalvan@users.sourceforge.net)
+\# Copyright (c) 2009 - 2012 Muriel Salvan (muriel@x-aeon.com)
 \# Licensed under the terms specified in LICENSE file. No warranty is provided.
 \#++
 

@@ -1,5 +1,5 @@
 #--
-# Copyright (c) 2009 - 2011 Muriel Salvan (murielsalvan@users.sourceforge.net)
+# Copyright (c) 2009 - 2012 Muriel Salvan (muriel@x-aeon.com)
 # Licensed under the terms specified in LICENSE file. No warranty is provided.
 #++
 
@@ -85,7 +85,7 @@ Ruby found in environment. Using it directly.
 
         # Get Ruby's signature when invoked from command line
         #
-        # Return:
+        # Return::
         # * _String_: Ruby's signature
         def getRubySignature
           lRubyReleaseInfo = nil

@@ -1,6 +1,6 @@
 # coding: utf-8
 #--
-# Copyright (c) 2009 - 2011 Muriel Salvan (murielsalvan@users.sourceforge.net)
+# Copyright (c) 2009 - 2012 Muriel Salvan (muriel@x-aeon.com)
 # Licensed under the terms specified in LICENSE file. No warranty is provided.
 #++
 
@@ -15,7 +15,7 @@ module RubyPackager
 
   # Copy a list of files patterns to the release directory
   #
-  # Parameters:
+  # Parameters::
   # * *iRootDir* (_String_): The root dir
   # * *iReleaseDir* (_String_): The release dir
   # * *iFilesPatterns* (<em>list<String></em>): The list of files patterns
@@ -35,9 +35,9 @@ module RubyPackager
           lDestFileName = "#{iReleaseDir}/#{lRelativeName}"
           FileUtils::mkdir_p(File.dirname(lDestFileName))
           if (File.directory?(iFileName))
-            logDebug "Create directory #{lRelativeName}"
+            log_debug "Create directory #{lRelativeName}"
           else
-            logDebug "Copy file #{lRelativeName}"
+            log_debug "Copy file #{lRelativeName}"
             FileUtils::cp(iFileName, lDestFileName)
           end
         end
@@ -50,7 +50,7 @@ module RubyPackager
 
     # Constructor
     #
-    # Parameters:
+    # Parameters::
     # * *iPluginsManager* (<em>RUtilAnts::Plugins::PluginsManager</em>): The Plugins manager
     # * *iReleaseInfo* (_ReleaseInfo_): The release information
     # * *iRootDir* (_String_): The root directory, containing files to ship in the distribution
@@ -90,7 +90,7 @@ module RubyPackager
 
     # Release
     #
-    # Return:
+    # Return::
     # * _Boolean_: Success ?
     def execute
       rSuccess = true
@@ -105,22 +105,22 @@ module RubyPackager
         end
         if (!@ReleaseInfo.ExecutablesInfo.empty?)
           # Check tools for platform dependent considerations
-          if (!@PlatformReleaseInfo.checkExeTools(@RootDir, @IncludeRuby))
+          if (!@PlatformReleaseInfo.check_exe_tools(@RootDir, @IncludeRuby))
             rSuccess = false
           end
         end
         @Installers.each do |iInstallerName|
-          @PluginsManager.accessPlugin('Installers', iInstallerName) do |ioPlugin|
-            if ((ioPlugin.respond_to?(:checkTools)) and
-                (!ioPlugin.checkTools))
+          @PluginsManager.access_plugin('Installers', iInstallerName) do |ioPlugin|
+            if ((ioPlugin.respond_to?(:check_tools)) and
+                (!ioPlugin.check_tools))
               rSuccess = false
             end
           end
         end
         @Distributors.each do |iDistributorName|
-          @PluginsManager.accessPlugin('Distributors', iDistributorName) do |ioPlugin|
-            if ((ioPlugin.respond_to?(:checkTools)) and
-                (!ioPlugin.checkTools))
+          @PluginsManager.access_plugin('Distributors', iDistributorName) do |ioPlugin|
+            if ((ioPlugin.respond_to?(:check_tools)) and
+                (!ioPlugin.check_tools))
               rSuccess = false
             end
           end
@@ -146,8 +146,8 @@ module RubyPackager
                 lGeneratedInstallers = []
                 @Installers.each do |iInstallerName|
                   logOp("Create installer #{iInstallerName}") do
-                    @PluginsManager.accessPlugin('Installers', iInstallerName) do |ioPlugin|
-                      lFileName = ioPlugin.createInstaller(@RootDir, @ReleaseDir, @InstallerDir, @ReleaseVersion, @ReleaseInfo, @IncludeTest)
+                    @PluginsManager.access_plugin('Installers', iInstallerName) do |ioPlugin|
+                      lFileName = ioPlugin.create_installer(@RootDir, @ReleaseDir, @InstallerDir, @ReleaseVersion, @ReleaseInfo, @IncludeTest)
                       if (lFileName == nil)
                         rSuccess = false
                       else
@@ -160,7 +160,7 @@ module RubyPackager
                   # 5. Distribute
                   @Distributors.each do |iDistributorName|
                     logOp("Distribute to #{iDistributorName}") do
-                      @PluginsManager.accessPlugin('Distributors', iDistributorName) do |ioPlugin|
+                      @PluginsManager.access_plugin('Distributors', iDistributorName) do |ioPlugin|
                         if (!ioPlugin.distribute(@InstallerDir, @ReleaseVersion, @ReleaseInfo, lGeneratedInstallers, @DocDir))
                           rSuccess = false
                         end
@@ -181,18 +181,18 @@ module RubyPackager
 
     # Log an operation, and call some code inside
     #
-    # Parameters:
+    # Parameters::
     # * *iOperationName* (_String_): Operation name
     # * *CodeBlock*: Code to call in this operation
     def logOp(iOperationName)
-      logDebug "===== #{iOperationName} ..."
+      log_debug "===== #{iOperationName} ..."
       yield
-      logDebug "===== ... #{iOperationName}"
+      log_debug "===== ... #{iOperationName}"
     end
 
     # Release files in a directory, and create the executable if needed
     #
-    # Return:
+    # Return::
     # * _Boolean_: Success ?
     def releaseFiles
       rSuccess = true
@@ -223,7 +223,7 @@ module RubyPackager
           logOp("Create binary #{iExecutableInfo[:ExeName]}") do
             # TODO (crate): When crate will work correctly under Windows, use it here to pack everything
             # For now the executable creation is platform dependent
-            rSuccess = @PlatformReleaseInfo.createBinary(@RootDir, @ReleaseDir, @IncludeRuby, iExecutableInfo)
+            rSuccess = @PlatformReleaseInfo.create_binary(@RootDir, @ReleaseDir, @IncludeRuby, iExecutableInfo)
           end
         end
       end
@@ -243,7 +243,7 @@ module RubyPackager
 
     # Generate rdoc
     #
-    # Return:
+    # Return::
     # * _Boolean_: Success ?
     def generateRDoc
       rSuccess = true
@@ -277,7 +277,7 @@ module RubyPackager
           '--line-numbers',
           '--tab-width=2',
           "--title=#{@ReleaseInfo.ProjectInfo[:Name].gsub(/'/,'\\\\\'')} v#{@ReleaseVersion}",
-          '--fileboxes',
+          '--hyperlink-all',
           '--charset=utf-8',
           '--exclude=.svn',
           '--exclude=.git',
@@ -288,12 +288,12 @@ module RubyPackager
           "--output=#{@DocDir}/rdoc"
         ]
         # Bug (RDoc): Sometimes it does not change current directory correctly (not deterministic)
-        changeDir(@ReleaseDir) do
+        change_dir(@ReleaseDir) do
           # First try with Muriel's template
           begin
             RDoc::RDoc.new.document( lRDocOptions + [ '--fmt=muriel' ] )
           rescue Exception
-            logWarn "Exception while generating using Muriel's templates: #{$!}: #{$!.backtrace.join("\n")}"
+            log_warn "Exception while generating using Muriel's templates: #{$!}: #{$!.backtrace.join("\n")}"
             # Then try with default template
             RDoc::RDoc.new.document( lRDocOptions )
           end
@@ -305,7 +305,7 @@ module RubyPackager
 
     # Generate a release note file to attach to this release
     #
-    # Return:
+    # Return::
     # * _Boolean_: Success ?
     def generateReleaseNote_HTML
       rSuccess = true
@@ -407,7 +407,7 @@ module RubyPackager
 
     # Generate a release note file to attach to this release
     #
-    # Return:
+    # Return::
     # * _Boolean_: Success ?
     def generateReleaseNote_TXT
       rSuccess = true
@@ -451,7 +451,7 @@ module RubyPackager
 
     # Get the last change log
     #
-    # Return:
+    # Return::
     # * <em>list<String></em>: The change log lines
     def getLastChangeLog
       rLastChangesLines = []

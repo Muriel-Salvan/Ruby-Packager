@@ -1,6 +1,6 @@
 #!env ruby
 #--
-# Copyright (c) 2009 - 2011 Muriel Salvan (murielsalvan@users.sourceforge.net)
+# Copyright (c) 2009 - 2012 Muriel Salvan (muriel@x-aeon.com)
 # Licensed under the terms specified in LICENSE file. No warranty is provided.
 #++
 
@@ -12,9 +12,9 @@
 # 4. In the case of specified distributors, ship the generated installers to those distributors
 
 require 'rUtilAnts/Logging'
-RUtilAnts::Logging::initializeLogging("#{File.dirname(__FILE__)}/..", 'http://sourceforge.net/tracker/?group_id=274236&atid=1165400')
+RUtilAnts::Logging::install_logger_on_object(:lib_root_dir => "#{File.dirname(__FILE__)}/..", :bug_tracker_url => 'http://sourceforge.net/tracker/?group_id=274236&atid=1165400')
 require 'rUtilAnts/Misc'
-RUtilAnts::Misc.initializeMisc
+RUtilAnts::Misc.install_misc_on_object
 
 module RubyPackager
 
@@ -25,9 +25,9 @@ module RubyPackager
 
     # Run the releaser
     #
-    # Parameters:
+    # Parameters::
     # * *iParameters* (<em>list<String></em>): List of arguments, as in command-line
-    # Return:
+    # Return::
     # * _Boolean_: Success ?
     def run(iParameters)
       rSuccess = true
@@ -48,10 +48,10 @@ module RubyPackager
       # Parse for plugins
       require 'rUtilAnts/Plugins'
       lPluginsManager = RUtilAnts::Plugins::PluginsManager.new
-      lPluginsManager.parsePluginsFromDir('Installers', "#{File.dirname(FILE_PATH)}/../lib/RubyPackager/Installers", 'RubyPackager::Installers')
-      lPluginsManager.parsePluginsFromDir('Installers', "#{File.dirname(FILE_PATH)}/../lib/RubyPackager/#{RUBY_PLATFORM}/Installers", 'RubyPackager::Installers')
-      lPluginsManager.parsePluginsFromDir('Distributors', "#{File.dirname(FILE_PATH)}/../lib/RubyPackager/Distributors", 'RubyPackager::Distributors')
-      lPluginsManager.parsePluginsFromDir('Distributors', "#{File.dirname(FILE_PATH)}/../lib/RubyPackager/#{RUBY_PLATFORM}/Distributors", 'RubyPackager::Distributors')
+      lPluginsManager.parse_plugins_from_dir('Installers', "#{File.dirname(FILE_PATH)}/../lib/RubyPackager/Installers", 'RubyPackager::Installers')
+      lPluginsManager.parse_plugins_from_dir('Installers', "#{File.dirname(FILE_PATH)}/../lib/RubyPackager/#{RUBY_PLATFORM}/Installers", 'RubyPackager::Installers')
+      lPluginsManager.parse_plugins_from_dir('Distributors', "#{File.dirname(FILE_PATH)}/../lib/RubyPackager/Distributors", 'RubyPackager::Distributors')
+      lPluginsManager.parse_plugins_from_dir('Distributors', "#{File.dirname(FILE_PATH)}/../lib/RubyPackager/#{RUBY_PLATFORM}/Distributors", 'RubyPackager::Distributors')
 
       # Parse command line arguments
       # Variables set by the parser
@@ -74,7 +74,7 @@ module RubyPackager
       end
       lOptionsParser.on('-e', '--debug',
         'Activate debugging logs.') do
-        activateLogDebug(true)
+        activate_log_debug(true)
       end
       lOptionsParser.on('-v', '--version <Version>', String,
         '<Version>: Version string of the release.',
@@ -105,12 +105,12 @@ module RubyPackager
       end
       lOptionsParser.on('-i', '--installer <InstallerName>', String,
         '<InstallerName>: Name of an Installer to use.',
-        "Generate an installer. Can be specified multiple times. Available Installers are: #{lPluginsManager.getPluginNames('Installers').join(', ')}") do |iArg|
+        "Generate an installer. Can be specified multiple times. Available Installers are: #{lPluginsManager.get_plugins_names('Installers').join(', ')}") do |iArg|
         lInstallers << iArg
       end
       lOptionsParser.on('-d', '--distributor <DistributorName>', String,
         '<DistributorName>: Name of a Distributor to use.',
-        "Ship generated installers to a distributor. Can be specified multiple times. Available Distributors are: #{lPluginsManager.getPluginNames('Distributors').join(', ')}") do |iArg|
+        "Ship generated installers to a distributor. Can be specified multiple times. Available Distributors are: #{lPluginsManager.get_plugins_names('Distributors').join(', ')}") do |iArg|
         lDistributors << iArg
       end
       lReleaseInfo = nil
@@ -135,7 +135,7 @@ module RubyPackager
           end
         end
         # Check the installers
-        lAvailableInstallers = lPluginsManager.getPluginNames('Installers')
+        lAvailableInstallers = lPluginsManager.get_plugins_names('Installers')
         lInstallers.each do |iInstallerName|
           if (!lAvailableInstallers.include?(iInstallerName))
             puts "Unknown specified installer: #{iInstallerName}."
@@ -144,7 +144,7 @@ module RubyPackager
           end
         end
         # Check the distributors
-        lAvailableDistributors = lPluginsManager.getPluginNames('Distributors')
+        lAvailableDistributors = lPluginsManager.get_plugins_names('Distributors')
         lDistributors.each do |iDistributorName|
           if (!lAvailableDistributors.include?(iDistributorName))
             puts "Unknown specified distributor: #{iDistributorName}."
@@ -183,9 +183,9 @@ module RubyPackager
             lDistributors
           ).execute
           if (rSuccess)
-            logInfo 'Release successful.'
+            log_info 'Release successful.'
           else
-            logErr 'Error while releasing.'
+            log_err 'Error while releasing.'
           end
         end
       end

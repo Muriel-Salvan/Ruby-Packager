@@ -10,12 +10,12 @@ require 'rdoc/generator/markup'
 #  Here are the changes made from it:
 #  * Generate anchors from method names, therefore links can be persistent even if methods' order is changed when generating several times.
 #  * Changed a little bit of CSS:
-#  ** some users were complaining of colors not so readable.
-#  ** margins were all reduced to 0, making impossible to tabulate hierarchical lists in comments.
+#    * some users were complaining of colors not so readable.
+#    * margins were all reduced to 0, making impossible to tabulate hierarchical lists in comments.
 #  * Added raw content display in every file page display (in popup or main windows).
 #  * Added the possibility to add some project's metadata (Name, URL, links...) to each generated page.
 #
-#  Changes made by Muriel Salvan (murielsalvan@users.sourceforge.net)
+#  Changes made by Muriel Salvan (muriel@x-aeon.com)
 #  
 class RDoc::Generator::Muriel < RDoc::Generator::Darkfish
 

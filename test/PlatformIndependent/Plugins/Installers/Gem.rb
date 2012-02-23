@@ -1,5 +1,5 @@
 #--
-# Copyright (c) 2009 - 2011 Muriel Salvan (murielsalvan@users.sourceforge.net)
+# Copyright (c) 2009 - 2012 Muriel Salvan (muriel@x-aeon.com)
 # Licensed under the terms specified in LICENSE file. No warranty is provided.
 #++
 
@@ -50,7 +50,7 @@ module RubyPackager
                 assert(File.exists?(lGemName))
                 # Get back the specification to check it
                 lGemSpec = nil
-                changeDir(File.dirname(lGemName)) do
+                change_dir(File.dirname(lGemName)) do
                   require 'rubygems'
                   # TODO: Bug (Ruby): gem.bat instead of gem for Windows only. Make .bat files calleable without their extension.
                   if (RUBY_PLATFORM == 'i386-mswin32')
@@ -125,7 +125,7 @@ module RubyPackager
                 assert_equal('Project:Summary', lGemSpec.summary)
                 assert_equal(1, lGemSpec.dependencies.size)
                 assert_equal('GemDepName', lGemSpec.dependencies[0].name)
-                assert_equal([ [ '>=', ::Gem::Version.new('0.1') ] ], lGemSpec.dependencies[0].version_requirements.requirements)
+                assert_equal([ [ '>=', ::Gem::Version.new('0.1') ] ], lGemSpec.dependencies[0].requirement.requirements)
               end
             end
 

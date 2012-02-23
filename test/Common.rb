@@ -1,5 +1,5 @@
 #--
-# Copyright (c) 2009 - 2011 Muriel Salvan (murielsalvan@users.sourceforge.net)
+# Copyright (c) 2009 - 2012 Muriel Salvan (muriel@x-aeon.com)
 # Licensed under the terms specified in LICENSE file. No warranty is provided.
 #++
 
@@ -8,9 +8,8 @@ require 'fileutils'
 require 'rUtilAnts/Plugins'
 require 'RubyPackager/Tools'
 # Mute everything except errors
-RUtilAnts::Logging::initializeLogging(File.dirname(__FILE__), 'http://sourceforge.net/tracker/?group_id=274236&atid=1165400', true)
-#RUtilAnts::Logging::initializeLogging(File.dirname(__FILE__), 'http://sourceforge.net/tracker/?group_id=274236&atid=1165400', false)
-#activateLogDebug(true)
+RUtilAnts::Logging::install_logger_on_object(:lib_root_dir => File.dirname(__FILE__), :bug_tracker_url => 'http://sourceforge.net/tracker/?group_id=274236&atid=1165400', :mute_stdout => true)
+#RUtilAnts::Logging::install_logger_on_object(:lib_root_dir => File.dirname(__FILE__), :bug_tracker_url => 'http://sourceforge.net/tracker/?group_id=274236&atid=1165400', :mute_stdout => false, :debug_mode => true)
 
 # Bypass the creation of any PluginsManager to include our dummy plugins automatically
 module RUtilAnts
@@ -26,10 +25,10 @@ module RUtilAnts
       def initialize
         super
         # Add dummy Installers and Distributors
-        registerNewPlugin('Installers', 'DummyInstaller1', nil, nil, 'RubyPackager::Test::Common::DummyInstaller1', nil)
-        registerNewPlugin('Installers', 'DummyInstaller2', nil, nil, 'RubyPackager::Test::Common::DummyInstaller2', nil)
-        registerNewPlugin('Distributors', 'DummyDistributor1', nil, nil, 'RubyPackager::Test::Common::DummyDistributor1', nil)
-        registerNewPlugin('Distributors', 'DummyDistributor2', nil, nil, 'RubyPackager::Test::Common::DummyDistributor2', nil)
+        register_new_plugin('Installers', 'DummyInstaller1', nil, nil, 'RubyPackager::Test::Common::DummyInstaller1', nil)
+        register_new_plugin('Installers', 'DummyInstaller2', nil, nil, 'RubyPackager::Test::Common::DummyInstaller2', nil)
+        register_new_plugin('Distributors', 'DummyDistributor1', nil, nil, 'RubyPackager::Test::Common::DummyDistributor1', nil)
+        register_new_plugin('Distributors', 'DummyDistributor2', nil, nil, 'RubyPackager::Test::Common::DummyDistributor2', nil)
       end
 
     end
@@ -47,7 +46,7 @@ module RubyPackager
 
     # Execute some SSH command on a remote host protected with password
     #
-    # Parameters:
+    # Parameters::
     # * *iSSHHost* (_String_): The SSH host
     # * *iSSHLogin* (_String_): The SSH login
     # * *iCmd* (_String_): The command to execute
@@ -63,7 +62,7 @@ module RubyPackager
 
     # Copy files through SCP.
     #
-    # Parameters:
+    # Parameters::
     # * *iSCPHost* (_String_): Host
     # * *iSCPLogin* (_String_): Login
     # * *iFileSrc* (_String_): Path to local file to copy from
@@ -87,16 +86,16 @@ module RubyPackager
 
         # Create the installer with everything in the release directory.
         #
-        # Parameters:
+        # Parameters::
         # * *iRootDir* (_String_): The Root directory
         # * *iReleaseDir* (_String_): The release directory (all files to put in the installer are there)
         # * *iInstallerDir* (_String_): The directory where the installer has to be put
         # * *iVersion* (_String_): Release version
         # * *iReleaseInfo* (_ReleaseInfo_): Release info
         # * *iIncludeTest* (_Boolean_): Are test files part of the release ?
-        # Return:
+        # Return::
         # * _String_: File name to distribute, or nil in case of failure
-        def createInstaller(iRootDir, iReleaseDir, iInstallerDir, iVersion, iReleaseInfo, iIncludeTest)
+        def create_installer(iRootDir, iReleaseDir, iInstallerDir, iVersion, iReleaseInfo, iIncludeTest)
           rFileName = nil
 
           Dir.glob("#{iReleaseDir}/*").each do |iFileName|
@@ -115,16 +114,16 @@ module RubyPackager
 
         # Create the installer with everything in the release directory.
         #
-        # Parameters:
+        # Parameters::
         # * *iRootDir* (_String_): The Root directory
         # * *iReleaseDir* (_String_): The release directory (all files to put in the installer are there)
         # * *iInstallerDir* (_String_): The directory where the installer has to be put
         # * *iVersion* (_String_): Release version
         # * *iReleaseInfo* (_ReleaseInfo_): Release info
         # * *iIncludeTest* (_Boolean_): Are test files part of the release ?
-        # Return:
+        # Return::
         # * _String_: File name to distribute, or nil in case of failure
-        def createInstaller(iRootDir, iReleaseDir, iInstallerDir, iVersion, iReleaseInfo, iIncludeTest)
+        def create_installer(iRootDir, iReleaseDir, iInstallerDir, iVersion, iReleaseInfo, iIncludeTest)
           rFileName = nil
 
           Dir.glob("#{iReleaseDir}/*").each do |iFileName|
@@ -147,13 +146,13 @@ module RubyPackager
 
         # Distribute what has been generated
         #
-        # Parameters:
+        # Parameters::
         # * *iInstallerDir* (_String_): Directory where installers are generated
         # * *iReleaseVersion* (_String_): Release version
         # * *iReleaseInfo* (_ReleaseInfo_): Release info
         # * *iGeneratedFileNames* (<em>list<String></em>): List of files to distribute
         # * *iDocDir* (_String_): Directory where the documentation has been generated
-        # Return:
+        # Return::
         # * _Boolean_: Success ?
         def distribute(iInstallerDir, iReleaseVersion, iReleaseInfo, iGeneratedFileNames, iDocDir)
           rSuccess = true
@@ -175,13 +174,13 @@ module RubyPackager
 
         # Distribute what has been generated
         #
-        # Parameters:
+        # Parameters::
         # * *iInstallerDir* (_String_): Directory where installers are generated
         # * *iReleaseVersion* (_String_): Release version
         # * *iReleaseInfo* (_ReleaseInfo_): Release info
         # * *iGeneratedFileNames* (<em>list<String></em>): List of files to distribute
         # * *iDocDir* (_String_): Directory where the documentation has been generated
-        # Return:
+        # Return::
         # * _Boolean_: Success ?
         def distribute(iInstallerDir, iReleaseVersion, iReleaseInfo, iGeneratedFileNames, iDocDir)
           rSuccess = true
@@ -197,15 +196,15 @@ module RubyPackager
 
       # Execute a test
       #
-      # Parameters:
+      # Parameters::
       # * *iRepositoryName* (_String_): Name of the repository for the test
       # * *iArguments* (<em>list<String></em>): List of arguments to give to RubyPackager (except the release file)
       # * *iReleaseFileName* (_String_): Name of the release file, relatively to the Distribution directory of the application
       # * *iParams* (<em>map<Symbol,Object></em>): Additional parameters [optional = {}]
-      # ** *:IncludeRDoc* (_Boolean_): Do we generate RDoc ? [optional = false]
+      #   * *:IncludeRDoc* (_Boolean_): Do we generate RDoc ? [optional = false]
       # * _CodeBlock_: The code called once the released has been made
-      # ** *iReleaseDir* (_String_): The directory in which the release has been made
-      # ** *iReleaseInfo* (<em>RubyPackager::ReleaseInfo</em>): The release info read
+      #   * *iReleaseDir* (_String_): The directory in which the release has been made
+      #   * *iReleaseInfo* (<em>RubyPackager::ReleaseInfo</em>): The release info read
       def execTest(iRepositoryName, iArguments, iReleaseInfoFileName, iParams = {})
         lIncludeRDoc = iParams[:IncludeRDoc]
         if (lIncludeRDoc == nil)
@@ -223,7 +222,7 @@ module RubyPackager
         FileUtils::rm_rf("#{lAppDir}/Releases")
         # Launch everything
         lSuccess = nil
-        changeDir(lAppDir) do
+        change_dir(lAppDir) do
           if (lIncludeRDoc)
             lSuccess = RubyPackager::Launcher.new.run(iArguments + [ lRealReleaseInfoFileName ])
           else
@@ -249,12 +248,12 @@ module RubyPackager
 
       # Check content of a released ReleaseInfo file
       #
-      # Parameters:
+      # Parameters::
       # * *iReleaseDir* (_String_): The directory of the release
       # * *iReleaseInfo* (<em>RubyPackager::ReleaseInfo</em>): The release info used by the release
       # * *iParams* (<em>map<Symbol,Object></em>): Additional parameters:
-      # ** *:Version* (_String_): The version [optional = 'UnnamedVersion']
-      # ** *:Tags* (<em>list<String></em>): List of Tags [optional = []]
+      #   * *:Version* (_String_): The version [optional = 'UnnamedVersion']
+      #   * *:Tags* (<em>list<String></em>): List of Tags [optional = []]
       def checkReleaseInfo(iReleaseDir, iReleaseInfo, iParams = {})
         lVersion = iParams[:Version]
         if (lVersion == nil)
@@ -277,7 +276,7 @@ module RubyPackager
 
       # Check generated RDoc
       #
-      # Parameters:
+      # Parameters::
       # * *iReleaseDir* (_String_): The directory of the release
       # * *iReleaseInfo* (<em>RubyPackager::ReleaseInfo</em>): The release info used by the release
       def checkRDoc(iReleaseDir, iReleaseInfo)
@@ -286,7 +285,7 @@ module RubyPackager
 
       # Check generated release notes
       #
-      # Parameters:
+      # Parameters::
       # * *iReleaseDir* (_String_): The directory of the release
       # * *iReleaseInfo* (<em>RubyPackager::ReleaseInfo</em>): The release info used by the release
       def checkReleaseNotes(iReleaseDir, iReleaseInfo)
@@ -296,20 +295,20 @@ module RubyPackager
 
       # Run a generated executable and get its output
       #
-      # Parameters:
+      # Parameters::
       # * *iFileName* (_String_): The file name to execute
-      # Return:
+      # Return::
       # * _String_: The output
       def runExe(lExeFileName)
         rOutput = nil
 
-        changeDir(File.dirname(lExeFileName)) do
+        change_dir(File.dirname(lExeFileName)) do
           begin
             # TODO: Bug ???: On Linux, we need to "cd ." before, otherwise the executable is not found. Understand why and remove it.
             # TODO: Remove this code once we now what is the problem
             require 'rUtilAnts/Platform'
-            RUtilAnts::Platform::initializePlatform
-            if $rUtilAnts_Platform_Info.os == RUBY_PLATFORM
+            RUtilAnts::Platform::install_platform_on_object
+            if (os == RUBY_PLATFORM)
               rOutput = `cd .;#{File.basename(lExeFileName)}`
             else
               rOutput = `#{File.basename(lExeFileName)}`
@@ -324,14 +323,14 @@ module RubyPackager
 
       # Get the gem specification corresponding to a given gem file
       #
-      # Parameters:
+      # Parameters::
       # * *iGemFileName* (_String_): Name of the Gem file
-      # Return:
+      # Return::
       # * <em>Gem::Specification</em>: The corresponding Gem specification
       def getGemSpec(iGemFileName)
         rGemSpec = nil
 
-        changeDir(File.dirname(iGemFileName)) do
+        change_dir(File.dirname(iGemFileName)) do
           require 'rubygems'
           # TODO: Bug (Ruby): Remove this test when Ruby will be able to deal .bat files correctly.
           if (RUBY_PLATFORM == 'i386-mswin32')

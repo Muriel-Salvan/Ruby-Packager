@@ -1,0 +1,19 @@
+
+= Release Note for Project:Name - v. 0.0.1.20091030
+
+== Development status: Project:DevStatus
+
+
+== Detailed changes with previous version
+
+
+
+==  Useful links
+
+* Project web site: Project:WebPageURL
+* Download: https://sourceforge.net/projects//files/0.0.1.20091030/GemName-0.0.1.20091030.gem/download
+* Author: Author:Name (Author:WebPageURL) (Mail: Author:EMail)
+* Browse RDoc: Project:WebPageURLrdoc/0.0.1.20091030
+* Browse SVN: Project:SVNBrowseURL
+* View complete ChangeLog: Project:SVNBrowseURLChangeLog?view=markup
+* View README file: Project:SVNBrowseURLREADME?view=markup

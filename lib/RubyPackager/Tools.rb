@@ -1,5 +1,5 @@
 #--
-# Copyright (c) 2009 - 2011 Muriel Salvan (murielsalvan@users.sourceforge.net)
+# Copyright (c) 2009 - 2012 Muriel Salvan (muriel@x-aeon.com)
 # Licensed under the terms specified in LICENSE file. No warranty is provided.
 #++
 
@@ -13,9 +13,9 @@ module RubyPackager
     # Get a needed password.
     # Ask it from the user if we don't know it
     #
-    # Parameters:
+    # Parameters::
     # * *iLogin* (_String_): Login for which we want the password
-    # Return:
+    # Return::
     # * _String_: Password
     def getPassword(iLogin)
       if (@@Passwords[iLogin] == nil)
@@ -30,7 +30,7 @@ module RubyPackager
 
     # Execute some SSH command on a remote host protected with password
     #
-    # Parameters:
+    # Parameters::
     # * *iSSHHost* (_String_): The SSH host
     # * *iSSHLogin* (_String_): The SSH login
     # * *iCmd* (_String_): The command to execute
@@ -47,7 +47,7 @@ module RubyPackager
 
     # Copy files through SCP.
     #
-    # Parameters:
+    # Parameters::
     # * *iSCPHost* (_String_): Host
     # * *iSCPLogin* (_String_): Login
     # * *iFileSrc* (_String_): Path to local file to copy from

@@ -1,5 +1,5 @@
 #--
-# Copyright (c) 2009 - 2011 Muriel Salvan (murielsalvan@users.sourceforge.net)
+# Copyright (c) 2009 - 2012 Muriel Salvan (muriel@x-aeon.com)
 # Licensed under the terms specified in LICENSE file. No warranty is provided.
 #++
 
@@ -11,19 +11,19 @@ module RubyPackager
 
       # Create the installer with everything in the release directory.
       #
-      # Parameters:
+      # Parameters::
       # * *iRootDir* (_String_): The Root directory
       # * *iReleaseDir* (_String_): The release directory (all files to put in the installer are there)
       # * *iInstallerDir* (_String_): The directory where the installer has to be put
       # * *iVersion* (_String_): Release version
       # * *iReleaseInfo* (_ReleaseInfo_): Release info
       # * *iIncludeTest* (_Boolean_): Are test files part of the release ?
-      # Return:
+      # Return::
       # * _String_: File name to distribute, or nil in case of failure
-      def createInstaller(iRootDir, iReleaseDir, iInstallerDir, iVersion, iReleaseInfo, iIncludeTest)
+      def create_installer(iRootDir, iReleaseDir, iInstallerDir, iVersion, iReleaseInfo, iIncludeTest)
         rFileName = nil
 
-        changeDir(iReleaseDir) do
+        change_dir(iReleaseDir) do
           # 1. Generate the gemspec that will build the gem
           lStrHasRDoc = nil
           if (iReleaseInfo.GemInfo[:HasRDoc])
@@ -64,7 +64,7 @@ module RubyPackager
               lExecutablesDir = File.dirname(iExecutableInfo[:StartupRBFile])
             elsif (lExecutablesDir != File.dirname(iExecutableInfo[:StartupRBFile]))
               # Error
-              logErr "Executables should be all in the same directory. \"#{lExecutablesDir}\" and \"#{File.dirname(iExecutableInfo[:StartupRBFile])}\" are different directories."
+              log_err "Executables should be all in the same directory. \"#{lExecutablesDir}\" and \"#{File.dirname(iExecutableInfo[:StartupRBFile])}\" are different directories."
               lBinError = true
             end
             lExecutablesBase << File.basename(iExecutableInfo[:StartupRBFile])
@@ -122,7 +122,7 @@ end
             rescue ::Gem::SystemExitException
               # For RubyGems, this is normal behaviour: success results in an exception thrown with exit_code 0.
               if ($!.exit_code != 0)
-                logErr "RubyGems returned error #{$!.exit_code}."
+                log_err "RubyGems returned error #{$!.exit_code}."
                 lGemOK = false
               end
             end
@@ -133,7 +133,7 @@ end
               # Find the name of the Gem: it can differ depending on the platform
               rFileName = Dir.glob("#{iReleaseInfo.GemInfo[:GemName]}-#{iVersion}*.gem")[0]
               if (rFileName == nil)
-                logErr "Unable to find generated gem \"#{iReleaseInfo.GemInfo[:GemName]}-#{iVersion}*.gem\""
+                log_err "Unable to find generated gem \"#{iReleaseInfo.GemInfo[:GemName]}-#{iVersion}*.gem\""
               else
                 FileUtils::mv(rFileName, "#{iInstallerDir}/#{rFileName}")
               end

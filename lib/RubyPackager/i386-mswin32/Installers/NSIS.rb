@@ -1,5 +1,5 @@
 #--
-# Copyright (c) 2009 - 2011 Muriel Salvan (murielsalvan@users.sourceforge.net)
+# Copyright (c) 2009 - 2012 Muriel Salvan (muriel@x-aeon.com)
 # Licensed under the terms specified in LICENSE file. No warranty is provided.
 #++
 
@@ -11,14 +11,14 @@ module RubyPackager
 
       # Check that we can use this installer
       #
-      # Return:
+      # Return::
       # * _Boolean_: Can we use this installer ?
-      def checkTools
+      def check_tools
         rSuccess = true
 
         # Check that makensis is present
         if (!system('makensis /VERSION'))
-          logErr "Need to have MakeNSIS installed in the system PATH to create installer.\nPlease download and install MakeNSIS in the PATH from http://nsis.sourceforge.net/Main_Page"
+          log_err "Need to have MakeNSIS installed in the system PATH to create installer.\nPlease download and install MakeNSIS in the PATH from http://nsis.sourceforge.net/Main_Page"
           rSuccess = false
         end
 
@@ -27,19 +27,19 @@ module RubyPackager
 
       # Create the installer with everything in the release directory.
       #
-      # Parameters:
+      # Parameters::
       # * *iRootDir* (_String_): The Root directory
       # * *iReleaseDir* (_String_): The release directory (all files to put in the installer are there)
       # * *iInstallerDir* (_String_): The directory where the installer has to be put
       # * *iVersion* (_String_): Release version
       # * *iReleaseInfo* (_ReleaseInfo_): Release info
-      # Return:
+      # Return::
       # * _String_: File name to distribute, or nil in case of failure
-      def createInstaller(iRootDir, iReleaseDir, iInstallerDir, iVersion, iReleaseInfo)
+      def create_installer(iRootDir, iReleaseDir, iInstallerDir, iVersion, iReleaseInfo)
         rFileName = nil
 
         if (iReleaseInfo.InstallInfo[:NSISFileName] == nil)
-          logErr 'No NSISFileName specified among the Install description.'
+          log_err 'No NSISFileName specified among the Install description.'
         else
           lNSISOK = system("makensis /DVERSION=#{iVersion} \"/DRELEASEDIR=#{iReleaseDir.gsub(/\//,'\\')}\" \"#{iRootDir.gsub(/\//,'\\')}\\#{iReleaseInfo.InstallInfo[:NSISFileName].gsub(/\//,'\\')}\"")
           if (lNSISOK)
