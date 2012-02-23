@@ -62,7 +62,6 @@ module RubyPackager
         if (File.exists?("#{@DocDir}/rdoc"))
           uploadRDocOnSFNET
         end
-        uploadReleaseNoteOnSFNET
         uploadFilesOnSFNET
 
         return rSuccess
@@ -139,18 +138,6 @@ module RubyPackager
             "#{@SFReleaseDir}/#{iFileName}"
           )
         end
-      end
-
-      # Upload the Release note on SF.NET
-      def uploadReleaseNoteOnSFNET
-        log_debug 'Uploading Release Note on SF.NET ...'
-        scpWithPassword(
-          'shell.sourceforge.net',
-          @SFLogin,
-          "#{@DocDir}/ReleaseNote.html",
-          "#{@SFReleaseDir}/ReleaseNote.html"
-        )
-        log_info '!!! DON\'T FORGET to make association between ReleaseNote and Gem in SF.NET'
       end
 
     end

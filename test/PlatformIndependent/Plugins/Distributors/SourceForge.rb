@@ -29,9 +29,6 @@ module RubyPackager
                   [ 'SSH', { :Host => 'shell.sourceforge.net', :Login => 'login,unixname',
                     :Cmd => 'mkdir -p /home/frs/project/u/un/unixname/UnnamedVersion' } ],
                   [ 'SCP', { :Host => 'shell.sourceforge.net', :Login => 'login,unixname',
-                    :FileSrc => "#{iReleaseDir}/Documentation/ReleaseNote.html",
-                    :FileDst => '/home/frs/project/u/un/unixname/UnnamedVersion/ReleaseNote.html' } ],
-                  [ 'SCP', { :Host => 'shell.sourceforge.net', :Login => 'login,unixname',
                     :FileSrc => "#{iReleaseDir}/Installer/MainLib.rb.Installer1",
                     :FileDst => '/home/frs/project/u/un/unixname/UnnamedVersion/MainLib.rb.Installer1' } ]
                 ], $SSHCommands)
@@ -58,9 +55,6 @@ module RubyPackager
                     :FileDst => "#{lRDocBaseDir}/rdoc-UnnamedVersion.zip" } ],
                   [ 'SSH', { :Host => 'shell.sourceforge.net', :Login => 'login,unixname',
                     :Cmd => "unzip -o -d #{lRDocBaseDir} #{lRDocBaseDir}/rdoc-UnnamedVersion.zip ; mv #{lRDocBaseDir}/rdoc #{lRDocBaseDir}/UnnamedVersion ; rm #{lRDocBaseDir}/latest ; ln -s #{lRDocBaseDir}/UnnamedVersion #{lRDocBaseDir}/latest ; rm #{lRDocBaseDir}/rdoc-UnnamedVersion.zip" } ],
-                  [ 'SCP', { :Host => 'shell.sourceforge.net', :Login => 'login,unixname',
-                    :FileSrc => "#{iReleaseDir}/Documentation/ReleaseNote.html",
-                    :FileDst => '/home/frs/project/u/un/unixname/UnnamedVersion/ReleaseNote.html' } ],
                   [ 'SCP', { :Host => 'shell.sourceforge.net', :Login => 'login,unixname',
                     :FileSrc => "#{iReleaseDir}/Installer/MainLib.rb.Installer1",
                     :FileDst => '/home/frs/project/u/un/unixname/UnnamedVersion/MainLib.rb.Installer1' } ]
