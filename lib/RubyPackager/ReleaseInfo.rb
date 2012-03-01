@@ -136,6 +136,8 @@ module RubyPackager
     # * *iParams* (<em>map<Symbol,Object></em>): The parameters:
     #   * *:login* (_String_): The releaser's SF.NET login
     #   * *:project_unix_name* (_String_): Unix name of the SF project
+    #   * *:ask_for_password* (_Boolean_): Do we ask for the user password to give to SSH ?
+    #   * *:ask_for_key_passphrase* (_Boolean_): Do we ask for the key passphrase to give to SSH ?
     # Return::
     # * _ReleaseInfo_: self
     def source_forge(iParams)

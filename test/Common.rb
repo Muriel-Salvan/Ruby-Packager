@@ -114,30 +114,26 @@ module RubyPackager
   # Redefine some functions used to communicate with external sites
   module Tools
 
-    alias :ssh_with_password_RBPTest :ssh_with_password
+    alias :ssh_RBPTest :ssh
     # Execute some SSH command on a remote host protected with password
     #
     # Parameters::
-    # * *iSSHHost* (_String_): The SSH host
-    # * *iSSHLogin* (_String_): The SSH login
     # * *iCmd* (_String_): The command to execute
-    def ssh_with_password(iSSHHost, iSSHLogin, iCmd)
-      check_expected_call('SSH', :Host => iSSHHost, :Login => iSSHLogin, :Cmd => iCmd) do
-        ssh_with_password_RBPTest(iSSHHost, iSSHLogin, iCmd)
+    def ssh(iCmd)
+      check_expected_call('SSH', :Host => @SSHHost, :Login => @SSHLogin, :Cmd => iCmd) do
+        ssh_RBPTest(iCmd)
       end
     end
 
-    alias :scp_with_password_RBPTest :scp_with_password
+    alias :scp_RBPTest :scp
     # Copy files through SCP.
     #
     # Parameters::
-    # * *iSCPHost* (_String_): Host
-    # * *iSCPLogin* (_String_): Login
     # * *iFileSrc* (_String_): Path to local file to copy from
     # * *iFileDst* (_String_): Path to remote file to copy to
-    def scp_with_password(iSCPHost, iSCPLogin, iFileSrc, iFileDst)
-      check_expected_call('SCP', :Host => iSCPHost, :Login => iSCPLogin, :FileSrc => iFileSrc, :FileDst => iFileDst) do
-        scp_with_password_RBPTest(iSCPHost, iSCPLogin, iFileSrc, iFileDst)
+    def scp(iFileSrc, iFileDst)
+      check_expected_call('SCP', :Host => @SSHHost, :Login => @SSHLogin, :FileSrc => iFileSrc, :FileDst => iFileDst) do
+        scp_RBPTest(iFileSrc, iFileDst)
       end
     end
 

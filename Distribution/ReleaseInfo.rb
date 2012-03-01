@@ -47,7 +47,7 @@ RubyPackager::ReleaseInfo.new.
   source_forge(
     :login => 'murielsalvan',
     :project_unix_name => 'rubypackager',
-    :auth_method => 'publickey'
+    :ask_for_key_passphrase => true
   ).
   ruby_forge(
     :project_unix_name => 'rubypackager'

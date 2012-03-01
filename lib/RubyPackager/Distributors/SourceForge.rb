@@ -56,7 +56,8 @@ module RubyPackager
         @InstallerDir, @ReleaseVersion, @ReleaseInfo, @GeneratedFileNames, @DocDir = iInstallerDir, iReleaseVersion, iReleaseInfo, iGeneratedFileNames, iDocDir
         @SFLogin = "#{@ReleaseInfo.sf_info[:login]},#{@ReleaseInfo.sf_info[:project_unix_name]}"
         @SFReleaseDir = "/home/frs/project/#{@ReleaseInfo.sf_info[:project_unix_name][0..0]}/#{@ReleaseInfo.sf_info[:project_unix_name][0..1]}/#{@ReleaseInfo.sf_info[:project_unix_name]}/#{@ReleaseVersion}"
-        createSFShell
+        set_ssh_options('shell.sourceforge.net', @SFLogin, @ReleaseInfo.sf_info)
+        ssh('create')
         createReleaseOnSFNET
         # It is possible that the RDoc has not been generated
         if (File.exists?("#{@DocDir}/rdoc"))
@@ -69,24 +70,6 @@ module RubyPackager
 
       private
 
-      # Create a Shell for SF.NET
-      def createSFShell
-        ssh_with_password(
-          'shell.sourceforge.net',
-          @SFLogin,
-          'create'
-        )
-      end
-
-      # Shutdown a Shell for SF.NET
-      def shutdownSFShell
-        ssh_with_password(
-          'shell.sourceforge.net',
-          @SFLogin,
-          'shutdown'
-        )
-      end
-
       # Upload the RDoc on SF.NET
       def uploadRDocOnSFNET
         log_debug 'Uploading RDoc on SF.NET ...'
@@ -96,23 +79,10 @@ module RubyPackager
         end
         # Send it
         lRDocBaseDir = "/home/project-web/#{@ReleaseInfo.sf_info[:project_unix_name]}/htdocs/rdoc"
-        ssh_with_password(
-          'shell.sourceforge.net',
-          @SFLogin,
-          "mkdir -p #{lRDocBaseDir}"
-        )
-        scp_with_password(
-          'shell.sourceforge.net',
-          @SFLogin,
-          "#{@DocDir}/rdoc.zip",
-          "#{lRDocBaseDir}/rdoc-#{@ReleaseVersion}.zip"
-        )
+        ssh("mkdir -p #{lRDocBaseDir}")
+        scp("#{@DocDir}/rdoc.zip", "#{lRDocBaseDir}/rdoc-#{@ReleaseVersion}.zip")
         # Execute its uncompress remotely
-        ssh_with_password(
-          'shell.sourceforge.net',
-          @SFLogin,
-          "unzip -o -d #{lRDocBaseDir} #{lRDocBaseDir}/rdoc-#{@ReleaseVersion}.zip ; mv #{lRDocBaseDir}/rdoc #{lRDocBaseDir}/#{@ReleaseVersion} ; rm #{lRDocBaseDir}/latest ; ln -s #{lRDocBaseDir}/#{@ReleaseVersion} #{lRDocBaseDir}/latest ; rm #{lRDocBaseDir}/rdoc-#{@ReleaseVersion}.zip"
-        )
+        ssh("unzip -o -d #{lRDocBaseDir} #{lRDocBaseDir}/rdoc-#{@ReleaseVersion}.zip ; mv #{lRDocBaseDir}/rdoc #{lRDocBaseDir}/#{@ReleaseVersion} ; rm #{lRDocBaseDir}/latest ; ln -s #{lRDocBaseDir}/#{@ReleaseVersion} #{lRDocBaseDir}/latest ; rm #{lRDocBaseDir}/rdoc-#{@ReleaseVersion}.zip")
         # Remove temporary file
         File.unlink("#{@DocDir}/rdoc.zip")
       end
@@ -120,23 +90,14 @@ module RubyPackager
       # Create the release on SF.NET
       def createReleaseOnSFNET
         log_debug 'Creating Release on SF.NET ...'
-        ssh_with_password(
-          'shell.sourceforge.net',
-          @SFLogin,
-          "mkdir -p #{@SFReleaseDir}"
-        )
+        ssh("mkdir -p #{@SFReleaseDir}")
       end
 
       # Upload the generated files on SF.NET
       def uploadFilesOnSFNET
         @GeneratedFileNames.each do |iFileName|
           log_debug "Uploading #{iFileName} on SF.NET ..."
-          scp_with_password(
-            'shell.sourceforge.net',
-            @SFLogin,
-            "#{@InstallerDir}/#{iFileName}",
-            "#{@SFReleaseDir}/#{iFileName}"
-          )
+          scp("#{@InstallerDir}/#{iFileName}", "#{@SFReleaseDir}/#{iFileName}")
         end
       end
 
