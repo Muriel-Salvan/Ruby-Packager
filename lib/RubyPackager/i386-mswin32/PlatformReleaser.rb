@@ -19,9 +19,10 @@ module RubyPackager
     # Parameters::
     # * *iRootDir* (_String_): Root directory
     # * *iIncludeRuby* (_Boolean_): Do we include Ruby in the release ?
+    # * *iNeedBinaryCompilation* (_Boolean_): Do we need to compile RB files into a binary executable ?
     # Return::
     # * _Boolean_: Are tools correctly useable ?
-    def check_exe_tools(iRootDir, iIncludeRuby)
+    def check_exe_tools(iRootDir, iIncludeRuby, iNeedBinaryCompilation)
       rSuccess = true
 
       if (iIncludeRuby)
@@ -31,15 +32,17 @@ module RubyPackager
           rSuccess = false
         end
       end
-      # Check that edicon is present
-      if (!File.exists?("#{PLATFORM_DIR}/edicon/edicon.exe"))
-        log_err "Need to have edicon.exe installed in #{PLATFORM_DIR}/edicon to set a Windows executable's icon.\nPlease install edicon, part of Ocra Gem (gem install ocra), and copy from the Gem directory (ocra-1.1.1/share/ocra/edicon.exe) to #{PLATFORM_DIR}/edicon/edicon.exe."
-        rSuccess = false
-      end
-      # Check that exerb is present
-      if (!system('exerb.bat --version'))
-        log_err "Need to have exerb installed in the system PATH to create a Windows executable.\nPlease download and install exerb from http://exerb.sourceforge.jp/index.en.html"
-        rSuccess = false
+      if (iNeedBinaryCompilation)
+        # Check that edicon is present
+        if (!File.exists?("#{PLATFORM_DIR}/edicon/edicon.exe"))
+          log_err "Need to have edicon.exe installed in #{PLATFORM_DIR}/edicon to set a Windows executable's icon.\nPlease install edicon, part of Ocra Gem (gem install ocra), and copy from the Gem directory (ocra-1.1.1/share/ocra/edicon.exe) to #{PLATFORM_DIR}/edicon/edicon.exe."
+          rSuccess = false
+        end
+        # Check that exerb is present
+        if (!system('exerb.bat --version'))
+          log_err "Need to have exerb installed in the system PATH to create a Windows executable.\nPlease download and install exerb from http://exerb.sourceforge.jp/index.en.html"
+          rSuccess = false
+        end
       end
 
       return rSuccess

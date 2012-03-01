@@ -40,12 +40,14 @@ RubyPackager::ReleaseInfo.new.
     :TestFile => 'test/run.rb',
     :GemDependencies => [
       [ 'rUtilAnts', '>= 0.1' ],
-      'allinoneruby'
+      'allinoneruby',
+      'highline'
     ]
   ).
   sourceForge(
     :Login => 'murielsalvan',
-    :ProjectUnixName => 'rubypackager'
+    :ProjectUnixName => 'rubypackager',
+    :AuthMethod => 'publickey'
   ).
   rubyForge(
     :ProjectUnixName => 'rubypackager'

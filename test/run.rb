@@ -7,6 +7,8 @@
 
 require 'test/unit'
 
+$RBPTest_Debug = false
+
 # Add the path
 lRootDir = File.expand_path("#{File.dirname(__FILE__)}/..")
 $LOAD_PATH << lRootDir
@@ -15,6 +17,7 @@ $LOAD_PATH << "#{lRootDir}/test"
 
 require 'bin/Release'
 require 'Common'
+activate_log_debug($RBPTest_Debug)
 
 # Run the test cases for our platform only
 ( Dir.glob("#{File.dirname(__FILE__)}/PlatformIndependent/**/*.rb") +

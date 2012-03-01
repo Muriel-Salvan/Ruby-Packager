@@ -19,9 +19,10 @@ module RubyPackager
     # Parameters::
     # * *iRootDir* (_String_): Root directory
     # * *iIncludeRuby* (_Boolean_): Do we include Ruby in the release ?
+    # * *iNeedBinaryCompilation* (_Boolean_): Do we need to compile RB files into a binary executable ?
     # Return::
     # * _Boolean_: Are tools correctly useable ?
-    def check_exe_tools(iRootDir, iIncludeRuby)
+    def check_exe_tools(iRootDir, iIncludeRuby, iNeedBinaryCompilation)
       rSuccess = true
 
       if (iIncludeRuby)

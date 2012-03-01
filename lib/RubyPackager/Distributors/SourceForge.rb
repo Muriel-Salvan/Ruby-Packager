@@ -71,7 +71,7 @@ module RubyPackager
 
       # Create a Shell for SF.NET
       def createSFShell
-        sshWithPassword(
+        ssh_with_password(
           'shell.sourceforge.net',
           @SFLogin,
           'create'
@@ -80,7 +80,7 @@ module RubyPackager
 
       # Shutdown a Shell for SF.NET
       def shutdownSFShell
-        sshWithPassword(
+        ssh_with_password(
           'shell.sourceforge.net',
           @SFLogin,
           'shutdown'
@@ -96,19 +96,19 @@ module RubyPackager
         end
         # Send it
         lRDocBaseDir = "/home/project-web/#{@ReleaseInfo.SFInfo[:ProjectUnixName]}/htdocs/rdoc"
-        sshWithPassword(
+        ssh_with_password(
           'shell.sourceforge.net',
           @SFLogin,
           "mkdir -p #{lRDocBaseDir}"
         )
-        scpWithPassword(
+        scp_with_password(
           'shell.sourceforge.net',
           @SFLogin,
           "#{@DocDir}/rdoc.zip",
           "#{lRDocBaseDir}/rdoc-#{@ReleaseVersion}.zip"
         )
         # Execute its uncompress remotely
-        sshWithPassword(
+        ssh_with_password(
           'shell.sourceforge.net',
           @SFLogin,
           "unzip -o -d #{lRDocBaseDir} #{lRDocBaseDir}/rdoc-#{@ReleaseVersion}.zip ; mv #{lRDocBaseDir}/rdoc #{lRDocBaseDir}/#{@ReleaseVersion} ; rm #{lRDocBaseDir}/latest ; ln -s #{lRDocBaseDir}/#{@ReleaseVersion} #{lRDocBaseDir}/latest ; rm #{lRDocBaseDir}/rdoc-#{@ReleaseVersion}.zip"
@@ -120,7 +120,7 @@ module RubyPackager
       # Create the release on SF.NET
       def createReleaseOnSFNET
         log_debug 'Creating Release on SF.NET ...'
-        sshWithPassword(
+        ssh_with_password(
           'shell.sourceforge.net',
           @SFLogin,
           "mkdir -p #{@SFReleaseDir}"
@@ -131,7 +131,7 @@ module RubyPackager
       def uploadFilesOnSFNET
         @GeneratedFileNames.each do |iFileName|
           log_debug "Uploading #{iFileName} on SF.NET ..."
-          scpWithPassword(
+          scp_with_password(
             'shell.sourceforge.net',
             @SFLogin,
             "#{@InstallerDir}/#{iFileName}",

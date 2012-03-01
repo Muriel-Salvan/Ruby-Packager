@@ -4,12 +4,12 @@
 #++
 
 require 'fileutils'
+require 'tmpdir'
 # Require rUtilAnts and RubyPackager now because we will redefine methods and classes in them.
 require 'rUtilAnts/Plugins'
 require 'RubyPackager/Tools'
-# Mute everything except errors
-RUtilAnts::Logging::install_logger_on_object(:lib_root_dir => File.dirname(__FILE__), :bug_tracker_url => 'http://sourceforge.net/tracker/?group_id=274236&atid=1165400', :mute_stdout => true)
-#RUtilAnts::Logging::install_logger_on_object(:lib_root_dir => File.dirname(__FILE__), :bug_tracker_url => 'http://sourceforge.net/tracker/?group_id=274236&atid=1165400', :mute_stdout => false, :debug_mode => true)
+# Mute everything except errors if we are not debugging
+RUtilAnts::Logging::install_logger_on_object(:lib_root_dir => File.dirname(__FILE__), :bug_tracker_url => 'http://sourceforge.net/tracker/?group_id=274236&atid=1165400', :mute_stdout => !$RBPTest_Debug)
 
 # Bypass the creation of any PluginsManager to include our dummy plugins automatically
 module RUtilAnts
@@ -37,29 +37,97 @@ module RUtilAnts
 
 end
 
+class Object
+
+  # Check a call was expected, and call a given code if it was both expected and not ignored
+  #
+  # Parameters:
+  # * *iCallType* (_String_): The call type
+  # * *iCallParams* (<em>map<Symbol,Object></em>): The call parameters
+  # * _CodeBlock_: Code to be called if the expected call is intended to be executed [optional = nil]
+  def check_expected_call(iCallType, iCallParams)
+    raise "Expecting no further call to be made. Received #{iCallType} with parameters #{iCallParams.inspect}." if $RBPTest_ExpectCalls.empty?
+    # Pop the first expected call
+    lExpectedCall = $RBPTest_ExpectCalls[0]
+    $RBPTest_ExpectCalls = $RBPTest_ExpectCalls[1..-1]
+    # Test that we expected this exact call
+    lMatchOK = ((lExpectedCall[0] == iCallType) and
+                (lExpectedCall[1].size == iCallParams.size))
+    if (lMatchOK)
+      # Match each parameter, with a special case for regexps
+      lExpectedCall[1].each do |iExpectParamName, iExpectParamValue|
+        if (iExpectParamValue.is_a?(Regexp))
+          if (iCallParams[iExpectParamName].is_a?(String))
+            if (iCallParams[iExpectParamName].match(iExpectParamValue) == nil)
+              lMatchOK = false
+              break
+            end
+          else
+            lMatchOK = false
+            break
+          end
+        elsif (iExpectParamValue != iCallParams[iExpectParamName])
+          lMatchOK = false
+          break
+        end
+      end
+    end
+    raise "Expecting call:\n#{lExpectedCall[0..1].inspect}\nbut received call\n#{[iCallType, iCallParams].inspect}\n." if !lMatchOK
+    # Analyze the behaviour to have
+    lBehaviourParams = lExpectedCall[2] || {}
+    if (lBehaviourParams[:Execute] and
+        block_given?)
+      yield
+    end
+  end
+
+end
+
+module Kernel
+
+  alias :system_RBTest :system
+  def system(iCmd)
+    rResult = true
+
+    check_expected_call('system', :Cmd => iCmd, :Dir => Dir.getwd) do
+      rResult = system_RBTest(iCmd)
+    end
+
+    return rResult
+  end
+
+  alias :backquote_RBTest :`
+  def `(iCmd)
+    rResult = true
+
+    check_expected_call('`', :Cmd => iCmd, :Dir => Dir.getwd) do
+      rResult = backquote_RBTest(iCmd)
+    end
+
+    return rResult
+  end
+
+end
+
 module RubyPackager
 
   # Redefine some functions used to communicate with external sites
   module Tools
 
-    remove_method :sshWithPassword
-
+    alias :ssh_with_password_RBPTest :ssh_with_password
     # Execute some SSH command on a remote host protected with password
     #
     # Parameters::
     # * *iSSHHost* (_String_): The SSH host
     # * *iSSHLogin* (_String_): The SSH login
     # * *iCmd* (_String_): The command to execute
-    def sshWithPassword(iSSHHost, iSSHLogin, iCmd)
-      $SSHCommands << [ 'SSH', {
-        :Host => iSSHHost,
-        :Login => iSSHLogin,
-        :Cmd => iCmd
-      } ]
+    def ssh_with_password(iSSHHost, iSSHLogin, iCmd)
+      check_expected_call('SSH', :Host => iSSHHost, :Login => iSSHLogin, :Cmd => iCmd) do
+        ssh_with_password_RBPTest(iSSHHost, iSSHLogin, iCmd)
+      end
     end
 
-    remove_method :scpWithPassword
-
+    alias :scp_with_password_RBPTest :scp_with_password
     # Copy files through SCP.
     #
     # Parameters::
@@ -67,13 +135,10 @@ module RubyPackager
     # * *iSCPLogin* (_String_): Login
     # * *iFileSrc* (_String_): Path to local file to copy from
     # * *iFileDst* (_String_): Path to remote file to copy to
-    def scpWithPassword(iSCPHost, iSCPLogin, iFileSrc, iFileDst)
-      $SSHCommands << [ 'SCP', {
-        :Host => iSCPHost,
-        :Login => iSCPLogin,
-        :FileSrc => iFileSrc,
-        :FileDst => iFileDst
-      } ]
+    def scp_with_password(iSCPHost, iSCPLogin, iFileSrc, iFileDst)
+      check_expected_call('SCP', :Host => iSCPHost, :Login => iSCPLogin, :FileSrc => iFileSrc, :FileDst => iFileDst) do
+        scp_with_password_RBPTest(iSCPHost, iSCPLogin, iFileSrc, iFileDst)
+      end
     end
 
   end
@@ -200,50 +265,80 @@ module RubyPackager
       # * *iRepositoryName* (_String_): Name of the repository for the test
       # * *iArguments* (<em>list<String></em>): List of arguments to give to RubyPackager (except the release file)
       # * *iReleaseFileName* (_String_): Name of the release file, relatively to the Distribution directory of the application
-      # * *iParams* (<em>map<Symbol,Object></em>): Additional parameters [optional = {}]
-      #   * *:IncludeRDoc* (_Boolean_): Do we generate RDoc ? [optional = false]
-      # * _CodeBlock_: The code called once the released has been made
+      # * *iParams* (<em>map<Symbol,Object></em>): Additional parameters. See exec_rbp for details [optional = {}]
+      # * _CodeBlock_: The code called once the release has been made
       #   * *iReleaseDir* (_String_): The directory in which the release has been made
       #   * *iReleaseInfo* (<em>RubyPackager::ReleaseInfo</em>): The release info read
       def execTest(iRepositoryName, iArguments, iReleaseInfoFileName, iParams = {})
-        lIncludeRDoc = iParams[:IncludeRDoc]
-        if (lIncludeRDoc == nil)
-          lIncludeRDoc = false
-        end
-        # Reset variables that will be used by dummy Distributors
-        # The list of commands SSH/SCP issued, along with their parameters
-        # list< [ String,      map< Symbol,        Object > ] >
-        # list< [ CommandName, map< AttributeName, Value  > ] >
-        $SSHCommands = []
-        # Go to the application directory
-        lAppDir = File.expand_path("#{File.dirname(__FILE__)}/Repository/#{iRepositoryName}")
-        lRealReleaseInfoFileName = "Distribution/#{iReleaseInfoFileName}"
-        # Clean the Releases dir if it exists already
-        FileUtils::rm_rf("#{lAppDir}/Releases")
-        # Launch everything
-        lSuccess = nil
-        change_dir(lAppDir) do
-          if (lIncludeRDoc)
-            lSuccess = RubyPackager::Launcher.new.run(iArguments + [ lRealReleaseInfoFileName ])
-          else
-            lSuccess = RubyPackager::Launcher.new.run(iArguments + [ '--no-rdoc', lRealReleaseInfoFileName ])
+        setup_repository(iRepositoryName) do |iRepositoryDir|
+          exec_rbp(iArguments, iReleaseInfoFileName, iParams) do |iReleaseDir, iReleaseInfo|
+            yield(iReleaseDir, iReleaseInfo)
           end
         end
+      end
+
+      # Setup a repository by copying one from the tests to a temporary folder.
+      # Call some code once the repository has been setup (also set current directory in this repository)
+      #
+      # Parameters::
+      # * *iRepositoryName* (_String_): Name of the repository for the test
+      # * _CodeBlock_: The code called once the repository has been setup
+      #   * *iRepositoryDir* (_String_): The repository directory
+      def setup_repository(iRepositoryName)
+        lAppDir = File.expand_path("#{File.dirname(__FILE__)}/Repository/#{iRepositoryName}")
+        @@IdxRepo = 0 if (defined?(@@IdxRepo) == nil)
+        lRepositoryDir = "#{Dir.tmpdir}/RBPTest/Repository_#{@@IdxRepo}"
+        @@IdxRepo += 1
+        FileUtils::rm_rf(lRepositoryDir) if (File.exists?(lRepositoryDir))
+        FileUtils::mkdir_p(lRepositoryDir)
+        FileUtils::cp_r("#{lAppDir}/.", lRepositoryDir)
+        change_dir(lRepositoryDir) do
+          yield(lRepositoryDir)
+        end
+        # In case of debug, don't clean up
+        if (!$RBPTest_Debug)
+          FileUtils::rm_rf(lRepositoryDir)
+        end
+      end
+
+      # Execute RubyPackager in the current directory, with parameters given.
+      #
+      # Parameters::
+      # * *iArguments* (<em>list<String></em>): List of arguments to give to RubyPackager (except the release file)
+      # * *iReleaseFileName* (_String_): Name of the release file, relatively to the Distribution directory of the application
+      # * *iParams* (<em>map<Symbol,Object></em>): Additional parameters [optional = {}]
+      #   * *:IncludeRDoc* (_Boolean_): Do we generate RDoc ? [optional = false]
+      #   * *:ExpectCalls* (<em>list< [CommandType,Params,Behaviour] ></em>): List of expected commands. Each element contains the expected command type (_String_) and parameters (<em>map<Symbol,Object></em>), and an optional behaviour hash (<em>map<Symbol,Object></em>).
+      # * _CodeBlock_: The code called once the release has been made
+      #   * *iReleaseDir* (_String_): The directory in which the release has been made
+      #   * *iReleaseInfo* (<em>RubyPackager::ReleaseInfo</em>): The release info read
+      def exec_rbp(iArguments, iReleaseInfoFileName, iParams = {})
+        lIncludeRDoc = iParams[:IncludeRDoc] || false
+        $RBPTest_ExpectCalls = iParams[:ExpectCalls] || []
+        # Reset variables that will be used by dummy Distributors
+        lRealReleaseInfoFileName = "Distribution/#{iReleaseInfoFileName}"
+        # Launch everything
+        lSuccess = RubyPackager::Launcher.new.run(
+          iArguments +
+          ($RBPTest_Debug ? [ '--debug' ] : []) +
+          (!lIncludeRDoc ? [ '--no-rdoc' ] : []) +
+          [ lRealReleaseInfoFileName ]
+        )
         # Check if everything is ok
         assert(lSuccess)
-        # Get the name of the directory
-        lDirs = Dir.glob("#{lAppDir}/Releases/#{RUBY_PLATFORM}/*/*/*")
+        # Make sure all expected calls have occurred
+        assert $RBPTest_ExpectCalls.empty?, "#{$RBPTest_ExpectCalls.size} calls were not performed: #{$RBPTest_ExpectCalls.inspect}"
+        # Get the name of the release directory
+        lDirs = Dir.glob("Releases/#{RUBY_PLATFORM}/*/*/*")
         assert_equal(1, lDirs.size)
         lReleaseDir = lDirs[0]
         # Read the release info
         lReleaseInfo = nil
-        File.open("#{lAppDir}/#{lRealReleaseInfoFileName}", 'r') do |iFile|
+        File.open(lRealReleaseInfoFileName, 'r') do |iFile|
           lReleaseInfo = eval(iFile.read)
         end
         assert(lReleaseInfo.kind_of?(RubyPackager::ReleaseInfo))
         yield(lReleaseDir, lReleaseInfo)
-        # Clean the Releases dir
-        FileUtils::rm_rf("#{lAppDir}/Releases")
       end
 
       # Check content of a released ReleaseInfo file
@@ -309,9 +404,9 @@ module RubyPackager
             require 'rUtilAnts/Platform'
             RUtilAnts::Platform::install_platform_on_object
             if (os == RUBY_PLATFORM)
-              rOutput = `cd .;#{File.basename(lExeFileName)}`
+              rOutput = backquote_RBTest("cd .;#{File.basename(lExeFileName)}")
             else
-              rOutput = `#{File.basename(lExeFileName)}`
+              rOutput = backquote_RBTest(File.basename(lExeFileName))
             end
           rescue Exception
             assert(false)
@@ -334,9 +429,9 @@ module RubyPackager
           require 'rubygems'
           # TODO: Bug (Ruby): Remove this test when Ruby will be able to deal .bat files correctly.
           if (RUBY_PLATFORM == 'i386-mswin32')
-            rGemSpec = eval(`gem.bat specification #{File.basename(iGemFileName)} --ruby`.gsub(/Gem::/,'::Gem::'))
+            rGemSpec = eval(backquote_RBTest("gem.bat specification #{File.basename(iGemFileName)} --ruby").gsub(/Gem::/,'::Gem::'))
           else
-            rGemSpec = eval(`gem specification #{File.basename(iGemFileName)} --ruby`.gsub(/Gem::/,'::Gem::'))
+            rGemSpec = eval(backquote_RBTest("gem specification #{File.basename(iGemFileName)} --ruby").gsub(/Gem::/,'::Gem::'))
           end
         end
 

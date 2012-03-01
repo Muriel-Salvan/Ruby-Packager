@@ -52,11 +52,13 @@ module RubyPackager
                 lGemSpec = nil
                 change_dir(File.dirname(lGemName)) do
                   require 'rubygems'
+                  require 'rUtilAnts/Platform'
+                  RUtilAnts::Platform::install_platform_on_object
                   # TODO: Bug (Ruby): gem.bat instead of gem for Windows only. Make .bat files calleable without their extension.
-                  if (RUBY_PLATFORM == 'i386-mswin32')
-                    lGemSpec = eval(`gem.bat specification #{File.basename(lGemName)} --ruby`.gsub(/Gem::/,'::Gem::'))
+                  if (os == RUtilAnts::Platform::OS_WINDOWS)
+                    lGemSpec = eval(backquote_RBTest("gem.bat specification #{File.basename(lGemName)} --ruby").gsub(/Gem::/,'::Gem::'))
                   else
-                    lGemSpec = eval(`gem specification #{File.basename(lGemName)} --ruby`.gsub(/Gem::/,'::Gem::'))
+                    lGemSpec = eval(backquote_RBTest("gem specification #{File.basename(lGemName)} --ruby").gsub(/Gem::/,'::Gem::'))
                   end
                 end
                 assert_equal('GemName', lGemSpec.name)

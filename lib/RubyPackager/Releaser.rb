@@ -78,10 +78,11 @@ module RubyPackager
       elsif (@IncludeTest)
         lStrOptions = 'IncludeTest'
       end
-      @ReleaseDir = "#{@ReleaseBaseDir}/#{RUBY_PLATFORM}/#{@ReleaseVersion}/#{lStrOptions}/#{Time.now.strftime('%Y_%m_%d_%H_%M_%S')}"
-      @InstallerDir = "#{@ReleaseDir}/Installer"
-      @DocDir = "#{@ReleaseDir}/Documentation"
-      @ReleaseDir += '/Release'
+      lBaseReleaseDir = "#{@ReleaseBaseDir}/#{RUBY_PLATFORM}/#{@ReleaseVersion}/#{lStrOptions}/#{Time.now.strftime('%Y_%m_%d_%H_%M_%S')}"
+      log_debug "Release to be performed in #{lBaseReleaseDir}"
+      @InstallerDir = "#{lBaseReleaseDir}/Installer"
+      @DocDir = "#{lBaseReleaseDir}/Documentation"
+      @ReleaseDir = "#{lBaseReleaseDir}/Release"
       require 'fileutils'
       FileUtils.mkdir_p(@ReleaseDir)
       FileUtils.mkdir_p(@InstallerDir)
@@ -104,8 +105,16 @@ module RubyPackager
           rSuccess = false
         end
         if (!@ReleaseInfo.ExecutablesInfo.empty?)
+          # Check first if there will be a need for binary compilation
+          lBinaryCompilation = false
+          @ReleaseInfo.ExecutablesInfo.each do |iExecutableInfo|
+            if (iExecutableInfo[:ExeName] != nil)
+              lBinaryCompilation = true
+              break
+            end
+          end
           # Check tools for platform dependent considerations
-          if (!@PlatformReleaseInfo.check_exe_tools(@RootDir, @IncludeRuby))
+          if (!@PlatformReleaseInfo.check_exe_tools(@RootDir, @IncludeRuby, lBinaryCompilation))
             rSuccess = false
           end
         end

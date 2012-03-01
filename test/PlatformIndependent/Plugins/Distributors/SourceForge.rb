@@ -18,47 +18,52 @@ module RubyPackager
             include RubyPackager::Test::Common
 
             def testBasicSend
-              execTest('Libraries/Basic', [ '-i', 'DummyInstaller1', '-d', 'SourceForge' ], 'ReleaseInfo_SF.rb') do |iReleaseDir, iReleaseInfo|
+              lFRSBaseDir = '/home/frs/project/u/un/unixname/UnnamedVersion'
+              lReleaseBaseDir = Regexp.escape("Releases/#{RUBY_PLATFORM}/UnnamedVersion/Normal/") + '\\d\\d\\d\\d_\\d\\d_\\d\\d_\\d\\d_\\d\\d_\\d\\d'
+              execTest('Libraries/Basic', [ '-i', 'DummyInstaller1', '-d', 'SourceForge' ], 'ReleaseInfo_SF.rb', :ExpectCalls => [
+                [ 'system', { :Cmd => 'zip -v', :Dir => /.*/ }, { :Execute => true } ],
+                [ 'SSH', { :Host => 'shell.sourceforge.net', :Login => 'login,unixname',
+                  :Cmd => 'create' } ],
+                [ 'SSH', { :Host => 'shell.sourceforge.net', :Login => 'login,unixname',
+                  :Cmd => "mkdir -p #{lFRSBaseDir}" } ],
+                [ 'SCP', { :Host => 'shell.sourceforge.net', :Login => 'login,unixname',
+                  :FileSrc => /^.*\/#{lReleaseBaseDir}\/Installer\/MainLib\.rb\.Installer1$/,
+                  :FileDst => "#{lFRSBaseDir}/MainLib.rb.Installer1" } ]
+              ]) do |iReleaseDir, iReleaseInfo|
                 checkReleaseInfo(iReleaseDir, iReleaseInfo)
                 checkReleaseNotes(iReleaseDir, iReleaseInfo)
                 assert(File.exists?("#{iReleaseDir}/Release/MainLib.rb"))
                 assert(File.exists?("#{iReleaseDir}/Installer/MainLib.rb.Installer1"))
-                assert_equal( [
-                  [ 'SSH', { :Host => 'shell.sourceforge.net', :Login => 'login,unixname',
-                    :Cmd => 'create' } ],
-                  [ 'SSH', { :Host => 'shell.sourceforge.net', :Login => 'login,unixname',
-                    :Cmd => 'mkdir -p /home/frs/project/u/un/unixname/UnnamedVersion' } ],
-                  [ 'SCP', { :Host => 'shell.sourceforge.net', :Login => 'login,unixname',
-                    :FileSrc => "#{iReleaseDir}/Installer/MainLib.rb.Installer1",
-                    :FileDst => '/home/frs/project/u/un/unixname/UnnamedVersion/MainLib.rb.Installer1' } ]
-                ], $SSHCommands)
               end
             end
 
             def testBasicSendWithRDoc
-              execTest('Libraries/Basic', [ '-i', 'DummyInstaller1', '-d', 'SourceForge' ], 'ReleaseInfo_SF.rb', :IncludeRDoc => true) do |iReleaseDir, iReleaseInfo|
+              lRDocBaseDir = '/home/project-web/unixname/htdocs/rdoc'
+              lFRSBaseDir = '/home/frs/project/u/un/unixname/UnnamedVersion'
+              lReleaseBaseDir = Regexp.escape("Releases/#{RUBY_PLATFORM}/UnnamedVersion/Normal/") + '\\d\\d\\d\\d_\\d\\d_\\d\\d_\\d\\d_\\d\\d_\\d\\d'
+              execTest('Libraries/Basic', [ '-i', 'DummyInstaller1', '-d', 'SourceForge' ], 'ReleaseInfo_SF.rb', :IncludeRDoc => true, :ExpectCalls => [
+                [ 'system', { :Cmd => 'zip -v', :Dir => /.*/ }, { :Execute => true } ],
+                [ 'SSH', { :Host => 'shell.sourceforge.net', :Login => 'login,unixname',
+                  :Cmd => 'create' } ],
+                [ 'SSH', { :Host => 'shell.sourceforge.net', :Login => 'login,unixname',
+                  :Cmd => "mkdir -p #{lFRSBaseDir}" } ],
+                [ 'system', { :Cmd => 'zip -r rdoc.zip rdoc', :Dir => /^.*\/#{lReleaseBaseDir}\/Documentation$/ }, { :Execute => true } ],
+                [ 'SSH', { :Host => 'shell.sourceforge.net', :Login => 'login,unixname',
+                  :Cmd => "mkdir -p #{lRDocBaseDir}" } ],
+                [ 'SCP', { :Host => 'shell.sourceforge.net', :Login => 'login,unixname',
+                  :FileSrc => /^.*\/#{lReleaseBaseDir}\/Documentation\/rdoc\.zip$/,
+                  :FileDst => "#{lRDocBaseDir}/rdoc-UnnamedVersion.zip" } ],
+                [ 'SSH', { :Host => 'shell.sourceforge.net', :Login => 'login,unixname',
+                  :Cmd => "unzip -o -d #{lRDocBaseDir} #{lRDocBaseDir}/rdoc-UnnamedVersion.zip ; mv #{lRDocBaseDir}/rdoc #{lRDocBaseDir}/UnnamedVersion ; rm #{lRDocBaseDir}/latest ; ln -s #{lRDocBaseDir}/UnnamedVersion #{lRDocBaseDir}/latest ; rm #{lRDocBaseDir}/rdoc-UnnamedVersion.zip" } ],
+                [ 'SCP', { :Host => 'shell.sourceforge.net', :Login => 'login,unixname',
+                  :FileSrc => /^.*\/#{lReleaseBaseDir}\/Installer\/MainLib\.rb\.Installer1$/,
+                  :FileDst => "#{lFRSBaseDir}/MainLib.rb.Installer1" } ]
+              ]) do |iReleaseDir, iReleaseInfo|
                 checkReleaseInfo(iReleaseDir, iReleaseInfo)
                 checkReleaseNotes(iReleaseDir, iReleaseInfo)
                 checkRDoc(iReleaseDir, iReleaseInfo)
                 assert(File.exists?("#{iReleaseDir}/Release/MainLib.rb"))
                 assert(File.exists?("#{iReleaseDir}/Installer/MainLib.rb.Installer1"))
-                lRDocBaseDir = '/home/project-web/unixname/htdocs/rdoc'
-                assert_equal( [
-                  [ 'SSH', { :Host => 'shell.sourceforge.net', :Login => 'login,unixname',
-                    :Cmd => 'create' } ],
-                  [ 'SSH', { :Host => 'shell.sourceforge.net', :Login => 'login,unixname',
-                    :Cmd => 'mkdir -p /home/frs/project/u/un/unixname/UnnamedVersion' } ],
-                  [ 'SSH', { :Host => 'shell.sourceforge.net', :Login => 'login,unixname',
-                    :Cmd => "mkdir -p #{lRDocBaseDir}" } ],
-                  [ 'SCP', { :Host => 'shell.sourceforge.net', :Login => 'login,unixname',
-                    :FileSrc => "#{iReleaseDir}/Documentation/rdoc.zip",
-                    :FileDst => "#{lRDocBaseDir}/rdoc-UnnamedVersion.zip" } ],
-                  [ 'SSH', { :Host => 'shell.sourceforge.net', :Login => 'login,unixname',
-                    :Cmd => "unzip -o -d #{lRDocBaseDir} #{lRDocBaseDir}/rdoc-UnnamedVersion.zip ; mv #{lRDocBaseDir}/rdoc #{lRDocBaseDir}/UnnamedVersion ; rm #{lRDocBaseDir}/latest ; ln -s #{lRDocBaseDir}/UnnamedVersion #{lRDocBaseDir}/latest ; rm #{lRDocBaseDir}/rdoc-UnnamedVersion.zip" } ],
-                  [ 'SCP', { :Host => 'shell.sourceforge.net', :Login => 'login,unixname',
-                    :FileSrc => "#{iReleaseDir}/Installer/MainLib.rb.Installer1",
-                    :FileDst => '/home/frs/project/u/un/unixname/UnnamedVersion/MainLib.rb.Installer1' } ]
-                ], $SSHCommands)
               end
             end
 
