@@ -39,7 +39,7 @@ RubyPackager::ReleaseInfo.new.
     :has_rdoc => true,
     :test_file => 'test/run.rb',
     :gem_dependencies => [
-      [ 'rUtilAnts', '>= 0.1' ],
+      [ 'rUtilAnts', '>= 1.0' ],
       'allinoneruby',
       'highline'
     ]

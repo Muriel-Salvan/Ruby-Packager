@@ -1,5 +1,44 @@
 = RubyPackager Release History
 
+== 1.0.0.20120301 (Beta)
+
+=== API changes
+
+* Adapted to Ruby's standard conventions.
+* Renamed public methods to match standard Ruby's conventions
+* Added dependency on allinoneruby
+* Added dependency on highline
+* Added a way to specify password for normal SSH login or passphrases
+
+=== New features
+
+* Hide passwords entered using highline library.
+* Removed --fileboxes deprecated option from RDoc
+* Added --hyperlink-all option for RDoc
+* Installer/RubyGems: Added RubyGems installer.
+* Installer/SourceForge: Adapted to new SF.net FRS system (regression adapted).
+* Installer/SourceForge: Do not ship release notes anymore
+
+=== Misc
+
+* Do not ask for exerb and edicon presence in the system if no binary packaging is needed.
+* Removed rdoc warning in documentation
+* Updated Copyright information
+* Updated email address of Muriel Salvan
+* Adapted comments to match a better RDoc syntax
+* Adapted to new version of rUtilAnts >= 1.0
+* Sanitized SSH interface
+
+=== Regression
+
+* Improved the way tests are written with system calls checking.
+* Moved regression runs in temporary directories.
+* Added a simple debug switch.
+
+=== Bug corrections
+
+* Regression: Gem testing did not work on all Windows platforms.
+
 == 0.2.1.20101110 (Beta)
 
 === Misc
