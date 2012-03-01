@@ -16,7 +16,7 @@ module RubyPackager
         # Test release a specific version
         def testVersion
           execTest('Libraries/Basic', [ '-v', '0.0.1.20091030' ], 'ReleaseInfo.rb') do |iReleaseDir, iReleaseInfo|
-            checkReleaseInfo(iReleaseDir, iReleaseInfo, :Version => '0.0.1.20091030')
+            checkReleaseInfo(iReleaseDir, iReleaseInfo, :version => '0.0.1.20091030')
             checkReleaseNotes(iReleaseDir, iReleaseInfo)
             assert(File.exists?("#{iReleaseDir}/Release/MainLib.rb"))
           end
@@ -25,7 +25,7 @@ module RubyPackager
         # Test release a specific version (long version)
         def testVersionLong
           execTest('Libraries/Basic', [ '--version=0.0.1.20091030' ], 'ReleaseInfo.rb') do |iReleaseDir, iReleaseInfo|
-            checkReleaseInfo(iReleaseDir, iReleaseInfo, :Version => '0.0.1.20091030')
+            checkReleaseInfo(iReleaseDir, iReleaseInfo, :version => '0.0.1.20091030')
             checkReleaseNotes(iReleaseDir, iReleaseInfo)
             assert(File.exists?("#{iReleaseDir}/Release/MainLib.rb"))
           end
@@ -34,7 +34,7 @@ module RubyPackager
         # Test release with Tags
         def testTags
           execTest('Libraries/Basic', [ '-t', 'Tag1', '-t', 'Tag2' ], 'ReleaseInfo.rb') do |iReleaseDir, iReleaseInfo|
-            checkReleaseInfo(iReleaseDir, iReleaseInfo, :Tags => ['Tag1', 'Tag2'] )
+            checkReleaseInfo(iReleaseDir, iReleaseInfo, :tags => ['Tag1', 'Tag2'] )
             checkReleaseNotes(iReleaseDir, iReleaseInfo)
             assert(File.exists?("#{iReleaseDir}/Release/MainLib.rb"))
           end
@@ -43,7 +43,7 @@ module RubyPackager
         # Test release with Tags (long version)
         def testTagsLong
           execTest('Libraries/Basic', [ '--tag=Tag1', '--tag=Tag2' ], 'ReleaseInfo.rb') do |iReleaseDir, iReleaseInfo|
-            checkReleaseInfo(iReleaseDir, iReleaseInfo, :Tags => ['Tag1', 'Tag2'] )
+            checkReleaseInfo(iReleaseDir, iReleaseInfo, :tags => ['Tag1', 'Tag2'] )
             checkReleaseNotes(iReleaseDir, iReleaseInfo)
             assert(File.exists?("#{iReleaseDir}/Release/MainLib.rb"))
           end

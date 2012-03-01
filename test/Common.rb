@@ -343,14 +343,14 @@ module RubyPackager
       # * *iReleaseDir* (_String_): The directory of the release
       # * *iReleaseInfo* (<em>RubyPackager::ReleaseInfo</em>): The release info used by the release
       # * *iParams* (<em>map<Symbol,Object></em>): Additional parameters:
-      #   * *:Version* (_String_): The version [optional = 'UnnamedVersion']
-      #   * *:Tags* (<em>list<String></em>): List of Tags [optional = []]
+      #   * *:version* (_String_): The version [optional = 'UnnamedVersion']
+      #   * *:tags* (<em>list<String></em>): List of Tags [optional = []]
       def checkReleaseInfo(iReleaseDir, iReleaseInfo, iParams = {})
-        lVersion = iParams[:Version]
+        lVersion = iParams[:version]
         if (lVersion == nil)
           lVersion = 'UnnamedVersion'
         end
-        lTags = iParams[:Tags]
+        lTags = iParams[:tags]
         if (lTags == nil)
           lTags = []
         end
@@ -360,8 +360,8 @@ module RubyPackager
           lReleasedInfo = eval(iFile.read)
         end
         assert(lReleasedInfo.kind_of?(Hash))
-        assert_equal(lVersion, lReleasedInfo[:Version])
-        assert_equal(lTags, lReleasedInfo[:Tags])
+        assert_equal(lVersion, lReleasedInfo[:version])
+        assert_equal(lTags, lReleasedInfo[:tags])
         assert_equal('Project:dev_status', lReleasedInfo[:dev_status])
       end
 
@@ -399,7 +399,7 @@ module RubyPackager
             # TODO: Remove this code once we now what is the problem
             require 'rUtilAnts/Platform'
             RUtilAnts::Platform::install_platform_on_object
-            if (os == RUBY_PLATFORM)
+            if (os == RUtilAnts::Platform::OS_LINUX)
               rOutput = backquote_RBTest("cd .;#{File.basename(lExeFileName)}")
             else
               rOutput = backquote_RBTest(File.basename(lExeFileName))
@@ -424,7 +424,7 @@ module RubyPackager
         change_dir(File.dirname(iGemFileName)) do
           require 'rubygems'
           # TODO: Bug (Ruby): Remove this test when Ruby will be able to deal .bat files correctly.
-          if (RUBY_PLATFORM == 'i386-mswin32')
+          if (os == RUtilAnts::Platform::OS_WINDOWS)
             rGemSpec = eval(backquote_RBTest("gem.bat specification #{File.basename(iGemFileName)} --ruby").gsub(/Gem::/,'::Gem::'))
           else
             rGemSpec = eval(backquote_RBTest("gem specification #{File.basename(iGemFileName)} --ruby").gsub(/Gem::/,'::Gem::'))

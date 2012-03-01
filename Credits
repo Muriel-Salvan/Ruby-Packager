@@ -10,6 +10,11 @@
 * http://exerb.sourceforge.jp/index.en.html
 * Used to create the executable entry point
 
+== HighLine
+* James Edward Gray II <james@grayproductions.net>
+* http://highline.rubyforge.org/
+* Used to mask password input
+
 == NSIS
 * kichik@users.sourceforge.net
 * http://nsis.sourceforge.net
@@ -29,6 +34,11 @@
 * Paul Duncan <pabs@pablotron.org>
 * http://rubygems.org/
 * Used to automatically download Gem dependencies
+
+== rUtilAnts
+* Muriel Salvan (http://murielsalvan.users.sourceforge.net)
+* http://rutilants.sourceforge.net
+* Used for plugins, logging and various helpers.
 
 = People that helped a lot in developing RubyPackager
 

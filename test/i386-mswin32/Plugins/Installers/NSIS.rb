@@ -19,7 +19,7 @@ module RubyPackager
 
             def testNSISCall
               execTest('Libraries/Basic', [ '-v', '0.0.1.20091030', '-i', 'NSIS' ], 'ReleaseInfo_NSIS.rb') do |iReleaseDir, iReleaseInfo|
-                checkReleaseInfo(iReleaseDir, iReleaseInfo, :Version => '0.0.1.20091030' )
+                checkReleaseInfo(iReleaseDir, iReleaseInfo, :version => '0.0.1.20091030' )
                 checkReleaseNotes(iReleaseDir, iReleaseInfo)
                 assert(File.exists?("#{iReleaseDir}/Release/MainLib.rb"))
                 assert(File.exists?("#{iReleaseDir}/Installer/InstallerName_0.0.1.20091030_setup.exe"))

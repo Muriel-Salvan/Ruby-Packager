@@ -19,7 +19,7 @@ module RubyPackager
 
             def testGemLibrary
               execTest('Libraries/Basic', [ '-v', '0.0.1.20091030', '-i', 'Gem' ], 'ReleaseInfo_Gem.rb') do |iReleaseDir, iReleaseInfo|
-                checkReleaseInfo(iReleaseDir, iReleaseInfo, :Version => '0.0.1.20091030' )
+                checkReleaseInfo(iReleaseDir, iReleaseInfo, :version => '0.0.1.20091030' )
                 checkReleaseNotes(iReleaseDir, iReleaseInfo)
                 assert(File.exists?("#{iReleaseDir}/Release/MainLib.rb"))
                 lGemName = "#{iReleaseDir}/Installer/GemName-0.0.1.20091030.gem"
@@ -42,7 +42,7 @@ module RubyPackager
 
             def testGemLibraryWithTest
               execTest('Libraries/Basic', [ '-v', '0.0.1.20091030', '-n', '-i', 'Gem' ], 'ReleaseInfo_TestGem.rb') do |iReleaseDir, iReleaseInfo|
-                checkReleaseInfo(iReleaseDir, iReleaseInfo, :Version => '0.0.1.20091030' )
+                checkReleaseInfo(iReleaseDir, iReleaseInfo, :version => '0.0.1.20091030' )
                 checkReleaseNotes(iReleaseDir, iReleaseInfo)
                 assert(File.exists?("#{iReleaseDir}/Release/MainLib.rb"))
                 assert(File.exists?("#{iReleaseDir}/Release/Test.rb"))
@@ -79,7 +79,7 @@ module RubyPackager
 
             def testGemExecutable
               execTest('Applications/Basic', [ '-v', '0.0.1.20091030', '-i', 'Gem' ], 'ReleaseInfo_Gem.rb') do |iReleaseDir, iReleaseInfo|
-                checkReleaseInfo(iReleaseDir, iReleaseInfo, :Version => '0.0.1.20091030' )
+                checkReleaseInfo(iReleaseDir, iReleaseInfo, :version => '0.0.1.20091030' )
                 checkReleaseNotes(iReleaseDir, iReleaseInfo)
                 assert(File.exists?("#{iReleaseDir}/Release/Main.rb"))
                 lGemName = "#{iReleaseDir}/Installer/GemName-0.0.1.20091030.gem"
@@ -107,7 +107,7 @@ module RubyPackager
 
             def testGemDependency
               execTest('Libraries/Basic', [ '-v', '0.0.1.20091030', '-i', 'Gem' ], 'ReleaseInfo_GemDep.rb') do |iReleaseDir, iReleaseInfo|
-                checkReleaseInfo(iReleaseDir, iReleaseInfo, :Version => '0.0.1.20091030' )
+                checkReleaseInfo(iReleaseDir, iReleaseInfo, :version => '0.0.1.20091030' )
                 checkReleaseNotes(iReleaseDir, iReleaseInfo)
                 assert(File.exists?("#{iReleaseDir}/Release/MainLib.rb"))
                 lGemName = "#{iReleaseDir}/Installer/GemName-0.0.1.20091030.gem"

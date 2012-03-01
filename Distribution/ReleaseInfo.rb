@@ -16,7 +16,7 @@ RubyPackager::ReleaseInfo.new.
     :description => 'Generate installable binary distributions of Ruby programs for many platforms (many OS, with or without Ruby installed on clients...). Fit to distribute extensible (plugins) Ruby programs also. Handles also libraries and uploads on websites (SF.net...).',
     :image_url => 'http://rubypackager.sourceforge.net/wiki/images/c/c9/Logo.png',
     :favicon_url => 'http://rubypackager.sourceforge.net/wiki/images/2/26/Favicon.png',
-    :browse_source_url => 'http://rubypackager.svn.sourceforge.net/viewvc/rubypackager/',
+    :browse_source_url => 'http://github.com/Muriel-Salvan/Ruby-Packager',
     :dev_status => 'Beta'
   ).
   add_core_files( [

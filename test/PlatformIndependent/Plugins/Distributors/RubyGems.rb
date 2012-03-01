@@ -29,7 +29,7 @@ module RubyPackager
                   :Dir => /^.*\/#{lReleaseBaseDir}\/Installer$/
                 } ]
               ]) do |iReleaseDir, iReleaseInfo|
-                checkReleaseInfo(iReleaseDir, iReleaseInfo, :Version => '0.0.1.20120228')
+                checkReleaseInfo(iReleaseDir, iReleaseInfo, :version => '0.0.1.20120228')
                 checkReleaseNotes(iReleaseDir, iReleaseInfo)
                 assert(File.exists?("#{iReleaseDir}/Release/MainLib.rb"))
                 lGemFileName = "#{iReleaseDir}/Installer/"

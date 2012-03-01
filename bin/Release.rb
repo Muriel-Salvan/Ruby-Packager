@@ -34,8 +34,8 @@ module RubyPackager
 
       # Get the RubyPackager version we are running on
       lRPReleaseInfo = {
-        :Version => 'Development',
-        :Tags => [],
+        :version => 'Development',
+        :tags => [],
         :dev_status => 'Unofficial'
       }
       lReleaseInfoFileName = "#{File.dirname(FILE_PATH)}/../ReleaseInfo"
@@ -159,7 +159,7 @@ module RubyPackager
       end
       if (rSuccess)
         if (lDisplayUsage)
-          puts "RubyPackager v. #{lRPReleaseInfo[:Version]} - #{lRPReleaseInfo[:dev_status]}"
+          puts "RubyPackager v. #{lRPReleaseInfo[:version]} - #{lRPReleaseInfo[:dev_status]}"
           puts ''
           puts lOptionsParser
         else
