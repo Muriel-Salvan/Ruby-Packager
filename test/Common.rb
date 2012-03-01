@@ -424,6 +424,8 @@ module RubyPackager
         change_dir(File.dirname(iGemFileName)) do
           require 'rubygems'
           # TODO: Bug (Ruby): Remove this test when Ruby will be able to deal .bat files correctly.
+          require 'rUtilAnts/Platform'
+          RUtilAnts::Platform::install_platform_on_object
           if (os == RUtilAnts::Platform::OS_WINDOWS)
             rGemSpec = eval(backquote_RBTest("gem.bat specification #{File.basename(iGemFileName)} --ruby").gsub(/Gem::/,'::Gem::'))
           else

@@ -1,5 +1,14 @@
 = RubyPackager Release History
 
+== 1.1.0.20120301 (Beta)
+
+This release changes the API from 1.0.0 (no more camelcase for some methods and parameters, notably generated ReleaseInfo files)
+
+* Missed some adaptations to Ruby's standard conventions.
+* Updated authors and credits info.
+* Updated browsing source url.
+* Bug correction: Regression: Corrected regression for run under Cygwin.
+
 == 1.0.0.20120301 (Beta)
 
 === API changes
