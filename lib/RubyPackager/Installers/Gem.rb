@@ -26,7 +26,7 @@ module RubyPackager
         change_dir(iReleaseDir) do
           # 1. Generate the gemspec that will build the gem
           lStrHasRDoc = nil
-          if (iReleaseInfo.GemInfo[:HasRDoc])
+          if (iReleaseInfo.gem_info[:has_rdoc])
             lStrHasRDoc = 'true'
           else
             lStrHasRDoc = 'false'
@@ -34,14 +34,14 @@ module RubyPackager
           # !!! Don't use absolute paths here, otherwise they will be stored in the Gem
           lStrFiles = "iSpec.files = [ '#{Dir.glob('**/*').join('\', \'')}' ]"
           lStrExtraRDocFiles = ''
-          if ((iReleaseInfo.GemInfo[:ExtraRDocFiles] != nil) and
-              (!iReleaseInfo.GemInfo[:ExtraRDocFiles].empty?))
-            lStrExtraRDocFiles = "iSpec.extra_rdoc_files = [ '#{iReleaseInfo.GemInfo[:ExtraRDocFiles].join('\', \'')}' ]"
-            RubyPackager::copyFiles(iRootDir, iReleaseDir, iReleaseInfo.GemInfo[:ExtraRDocFiles])
+          if ((iReleaseInfo.gem_info[:extra_rdoc_files] != nil) and
+              (!iReleaseInfo.gem_info[:extra_rdoc_files].empty?))
+            lStrExtraRDocFiles = "iSpec.extra_rdoc_files = [ '#{iReleaseInfo.gem_info[:extra_rdoc_files].join('\', \'')}' ]"
+            RubyPackager::copyFiles(iRootDir, iReleaseDir, iReleaseInfo.gem_info[:extra_rdoc_files])
           end
           lGemDepsStrList = []
-          if (iReleaseInfo.GemInfo[:GemDependencies] != nil)
-            iReleaseInfo.GemInfo[:GemDependencies].each do |iGemDepInfo|
+          if (iReleaseInfo.gem_info[:gem_dependencies] != nil)
+            iReleaseInfo.gem_info[:gem_dependencies].each do |iGemDepInfo|
               iGemName, iGemVersion = iGemDepInfo
               if (iGemVersion != nil)
                 lGemDepsStrList << "iSpec.add_dependency('#{iGemName}', '#{iGemVersion}')"
@@ -52,22 +52,22 @@ module RubyPackager
           end
           lStrTestFile = ''
           if ((iIncludeTest) and
-              (iReleaseInfo.GemInfo[:TestFile] != nil))
-            lStrTestFile = "iSpec.test_file = '#{iReleaseInfo.GemInfo[:TestFile]}'"
+              (iReleaseInfo.gem_info[:test_file] != nil))
+            lStrTestFile = "iSpec.test_file = '#{iReleaseInfo.gem_info[:test_file]}'"
           end
           # Compute the list of executable files and the executable directory
           lBinError = false
           lExecutablesDir = nil
           lExecutablesBase = []
-          iReleaseInfo.ExecutablesInfo.each do |iExecutableInfo|
+          iReleaseInfo.executables_info.each do |iExecutableInfo|
             if (lExecutablesDir == nil)
-              lExecutablesDir = File.dirname(iExecutableInfo[:StartupRBFile])
-            elsif (lExecutablesDir != File.dirname(iExecutableInfo[:StartupRBFile]))
+              lExecutablesDir = File.dirname(iExecutableInfo[:startup_rb_file])
+            elsif (lExecutablesDir != File.dirname(iExecutableInfo[:startup_rb_file]))
               # Error
-              log_err "Executables should be all in the same directory. \"#{lExecutablesDir}\" and \"#{File.dirname(iExecutableInfo[:StartupRBFile])}\" are different directories."
+              log_err "Executables should be all in the same directory. \"#{lExecutablesDir}\" and \"#{File.dirname(iExecutableInfo[:startup_rb_file])}\" are different directories."
               lBinError = true
             end
-            lExecutablesBase << File.basename(iExecutableInfo[:StartupRBFile])
+            lExecutablesBase << File.basename(iExecutableInfo[:startup_rb_file])
           end
           if (!lBinError)
             lStrBinDir = ''
@@ -78,11 +78,11 @@ module RubyPackager
             end
             # Compute require paths
             lRequirePaths = []
-            if (iReleaseInfo.GemInfo[:RequirePath] != nil)
-              lRequirePaths = [ iReleaseInfo.GemInfo[:RequirePath] ]
+            if (iReleaseInfo.gem_info[:require_path] != nil)
+              lRequirePaths = [ iReleaseInfo.gem_info[:require_path] ]
             end
-            if (iReleaseInfo.GemInfo[:RequirePaths] != nil)
-              lRequirePaths.concat(iReleaseInfo.GemInfo[:RequirePaths])
+            if (iReleaseInfo.gem_info[:require_paths] != nil)
+              lRequirePaths.concat(iReleaseInfo.gem_info[:require_paths])
             end
             lStrRequirePaths = 'iSpec.require_path = \'\''
             if (!lRequirePaths.empty?)
@@ -92,19 +92,19 @@ module RubyPackager
             File.open(lGemSpecFileName, 'w') do |oFile|
               oFile << "
 Gem::Specification.new do |iSpec|
-  iSpec.name = '#{iReleaseInfo.GemInfo[:GemName]}'
+  iSpec.name = '#{iReleaseInfo.gem_info[:gem_name]}'
   iSpec.version = '#{iVersion}'
-  iSpec.author = '#{iReleaseInfo.AuthorInfo[:Name].gsub(/'/,'\\\\\'')}'
-  iSpec.email = '#{iReleaseInfo.AuthorInfo[:EMail]}'
-  iSpec.homepage = '#{iReleaseInfo.ProjectInfo[:WebPageURL]}'
-  iSpec.platform = #{iReleaseInfo.GemInfo[:GemPlatformClassName]}
-  iSpec.summary = '#{iReleaseInfo.ProjectInfo[:Summary].gsub(/'/,'\\\\\'')}'
-  iSpec.description = '#{iReleaseInfo.ProjectInfo[:Description].gsub(/'/,'\\\\\'')}'
+  iSpec.author = '#{iReleaseInfo.author_info[:name].gsub(/'/,'\\\\\'')}'
+  iSpec.email = '#{iReleaseInfo.author_info[:email]}'
+  iSpec.homepage = '#{iReleaseInfo.project_info[:web_page_url]}'
+  iSpec.platform = #{iReleaseInfo.gem_info[:gem_platform_class_name]}
+  iSpec.summary = '#{iReleaseInfo.project_info[:summary].gsub(/'/,'\\\\\'')}'
+  iSpec.description = '#{iReleaseInfo.project_info[:description].gsub(/'/,'\\\\\'')}'
   #{lStrFiles}
   #{lStrRequirePaths}
   iSpec.has_rdoc = #{lStrHasRDoc}
   #{lStrExtraRDocFiles}
-  iSpec.rubyforge_project = '#{iReleaseInfo.RFInfo[:ProjectUnixName]}'
+  iSpec.rubyforge_project = '#{iReleaseInfo.rf_info[:project_unix_name]}'
   #{lStrTestFile}
   #{lStrBinDir}
   #{lStrExecutables}
@@ -131,9 +131,9 @@ end
               # Move the Gem to the destination directory
               require 'fileutils'
               # Find the name of the Gem: it can differ depending on the platform
-              rFileName = Dir.glob("#{iReleaseInfo.GemInfo[:GemName]}-#{iVersion}*.gem")[0]
+              rFileName = Dir.glob("#{iReleaseInfo.gem_info[:gem_name]}-#{iVersion}*.gem")[0]
               if (rFileName == nil)
-                log_err "Unable to find generated gem \"#{iReleaseInfo.GemInfo[:GemName]}-#{iVersion}*.gem\""
+                log_err "Unable to find generated gem \"#{iReleaseInfo.gem_info[:gem_name]}-#{iVersion}*.gem\""
               else
                 FileUtils::mv(rFileName, "#{iInstallerDir}/#{rFileName}")
               end

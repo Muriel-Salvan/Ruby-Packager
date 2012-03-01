@@ -38,13 +38,13 @@ module RubyPackager
       def create_installer(iRootDir, iReleaseDir, iInstallerDir, iVersion, iReleaseInfo)
         rFileName = nil
 
-        if (iReleaseInfo.InstallInfo[:NSISFileName] == nil)
+        if (iReleaseInfo.install_info[:nsis_file_name] == nil)
           log_err 'No NSISFileName specified among the Install description.'
         else
-          lNSISOK = system("makensis /DVERSION=#{iVersion} \"/DRELEASEDIR=#{iReleaseDir.gsub(/\//,'\\')}\" \"#{iRootDir.gsub(/\//,'\\')}\\#{iReleaseInfo.InstallInfo[:NSISFileName].gsub(/\//,'\\')}\"")
+          lNSISOK = system("makensis /DVERSION=#{iVersion} \"/DRELEASEDIR=#{iReleaseDir.gsub(/\//,'\\')}\" \"#{iRootDir.gsub(/\//,'\\')}\\#{iReleaseInfo.install_info[:nsis_file_name].gsub(/\//,'\\')}\"")
           if (lNSISOK)
-            lInstallerDir = File.dirname("#{iRootDir}/#{iReleaseInfo.InstallInfo[:NSISFileName]}")
-            rFileName = "#{iReleaseInfo.InstallInfo[:InstallerName]}_#{iVersion}_setup.exe"
+            lInstallerDir = File.dirname("#{iRootDir}/#{iReleaseInfo.install_info[:nsis_file_name]}")
+            rFileName = "#{iReleaseInfo.install_info[:installer_name]}_#{iVersion}_setup.exe"
             FileUtils.mv("#{lInstallerDir}/setup.exe", "#{iInstallerDir}/#{rFileName}")
           end
         end

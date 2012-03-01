@@ -54,8 +54,8 @@ module RubyPackager
         rSuccess = true
 
         @InstallerDir, @ReleaseVersion, @ReleaseInfo, @GeneratedFileNames, @DocDir = iInstallerDir, iReleaseVersion, iReleaseInfo, iGeneratedFileNames, iDocDir
-        @SFLogin = "#{@ReleaseInfo.SFInfo[:Login]},#{@ReleaseInfo.SFInfo[:ProjectUnixName]}"
-        @SFReleaseDir = "/home/frs/project/#{@ReleaseInfo.SFInfo[:ProjectUnixName][0..0]}/#{@ReleaseInfo.SFInfo[:ProjectUnixName][0..1]}/#{@ReleaseInfo.SFInfo[:ProjectUnixName]}/#{@ReleaseVersion}"
+        @SFLogin = "#{@ReleaseInfo.sf_info[:login]},#{@ReleaseInfo.sf_info[:project_unix_name]}"
+        @SFReleaseDir = "/home/frs/project/#{@ReleaseInfo.sf_info[:project_unix_name][0..0]}/#{@ReleaseInfo.sf_info[:project_unix_name][0..1]}/#{@ReleaseInfo.sf_info[:project_unix_name]}/#{@ReleaseVersion}"
         createSFShell
         createReleaseOnSFNET
         # It is possible that the RDoc has not been generated
@@ -95,7 +95,7 @@ module RubyPackager
           system("zip -r rdoc.zip rdoc")
         end
         # Send it
-        lRDocBaseDir = "/home/project-web/#{@ReleaseInfo.SFInfo[:ProjectUnixName]}/htdocs/rdoc"
+        lRDocBaseDir = "/home/project-web/#{@ReleaseInfo.sf_info[:project_unix_name]}/htdocs/rdoc"
         ssh_with_password(
           'shell.sourceforge.net',
           @SFLogin,

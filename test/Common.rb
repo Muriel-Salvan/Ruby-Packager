@@ -41,7 +41,7 @@ class Object
 
   # Check a call was expected, and call a given code if it was both expected and not ignored
   #
-  # Parameters:
+  # Parameters::
   # * *iCallType* (_String_): The call type
   # * *iCallParams* (<em>map<Symbol,Object></em>): The call parameters
   # * _CodeBlock_: Code to be called if the expected call is intended to be executed [optional = nil]
@@ -366,7 +366,7 @@ module RubyPackager
         assert(lReleasedInfo.kind_of?(Hash))
         assert_equal(lVersion, lReleasedInfo[:Version])
         assert_equal(lTags, lReleasedInfo[:Tags])
-        assert_equal('Project:DevStatus', lReleasedInfo[:DevStatus])
+        assert_equal('Project:dev_status', lReleasedInfo[:dev_status])
       end
 
       # Check generated RDoc

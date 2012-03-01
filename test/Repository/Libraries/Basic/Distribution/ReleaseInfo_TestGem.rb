@@ -5,29 +5,29 @@
 
 RubyPackager::ReleaseInfo.new.
   author(
-    :Name => 'Author:Name',
-    :EMail => 'Author:EMail',
-    :WebPageURL => 'Author:WebPageURL'
+    :name => 'Author:name',
+    :email => 'Author:email',
+    :web_page_url => 'Author:web_page_url'
   ).
   project(
-    :Name => 'Project:Name',
-    :WebPageURL => 'Project:WebPageURL',
-    :Summary => 'Project:Summary',
-    :Description => 'Project:Description',
-    :ImageURL => 'Project:ImageURL',
-    :FaviconURL => 'Project:FaviconURL',
-    :SVNBrowseURL => 'Project:SVNBrowseURL',
-    :DevStatus => 'Project:DevStatus'
+    :name => 'Project:name',
+    :web_page_url => 'Project:web_page_url',
+    :summary => 'Project:summary',
+    :description => 'Project:description',
+    :image_url => 'Project:image_url',
+    :favicon_url => 'Project:favicon_url',
+    :browse_source_url => 'Project:browse_source_url',
+    :dev_status => 'Project:dev_status'
   ).
-  addCoreFiles( [
+  add_core_files( [
     'MainLib.rb'
   ] ).
-  addTestFiles( [
+  add_test_files( [
     'Test.rb'
   ] ).
   gem(
-    :GemName => 'GemName',
-    :GemPlatformClassName => 'Gem::Platform::RUBY',
-    :HasRDoc => true,
-    :TestFile => 'Test.rb'
+    :gem_name => 'GemName',
+    :gem_platform_class_name => 'Gem::Platform::RUBY',
+    :has_rdoc => true,
+    :test_file => 'Test.rb'
   )

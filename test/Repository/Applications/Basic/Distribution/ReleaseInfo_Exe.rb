@@ -5,29 +5,29 @@
 
 RubyPackager::ReleaseInfo.new.
   author(
-    :Name => 'Author:Name',
-    :EMail => 'Author:EMail',
-    :WebPageURL => 'Author:WebPageURL'
+    :name => 'Author:name',
+    :email => 'Author:email',
+    :web_page_url => 'Author:web_page_url'
   ).
   project(
-    :Name => 'Project:Name',
-    :WebPageURL => 'Project:WebPageURL',
-    :Summary => 'Project:Summary',
-    :Description => 'Project:Description',
-    :ImageURL => 'Project:ImageURL',
-    :FaviconURL => 'Project:FaviconURL',
-    :SVNBrowseURL => 'Project:SVNBrowseURL',
-    :DevStatus => 'Project:DevStatus'
+    :name => 'Project:name',
+    :web_page_url => 'Project:web_page_url',
+    :summary => 'Project:summary',
+    :description => 'Project:description',
+    :image_url => 'Project:image_url',
+    :favicon_url => 'Project:favicon_url',
+    :browse_source_url => 'Project:browse_source_url',
+    :dev_status => 'Project:dev_status'
   ).
-  addCoreFiles( [
+  add_core_files( [
     '*'
   ] ).
   executable(
-    :StartupRBFile => 'Main.rb',
-    :ExeName => 'ExeName',
-    :IconName => "Distribution/#{RUBY_PLATFORM}/Icon.ico",
-    :TerminalApplication => false
+    :startup_rb_file => 'Main.rb',
+    :exe_name => 'ExeName',
+    :icon_name => "Distribution/#{RUBY_PLATFORM}/Icon.ico",
+    :terminal_application => false
   ).
   install(
-    :NSISFileName => "Distribution/#{RUBY_PLATFORM}/Installer/install.nsi"
+    :nsis_file_name => "Distribution/#{RUBY_PLATFORM}/Installer/install.nsi"
   )

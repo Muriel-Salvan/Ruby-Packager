@@ -67,7 +67,7 @@ module RubyPackager
       if (rSuccess)
         # Then create the real executable
         # Generate the Shell file that launches everything for Linux
-        File.open("#{iReleaseDir}/#{iExecutableInfo[:ExeName]}", 'w') do |oFile|
+        File.open("#{iReleaseDir}/#{iExecutableInfo[:exe_name]}", 'w') do |oFile|
           oFile << "\#!/bin/sh
 \#--
 \# Copyright (c) 2009 - 2012 Muriel Salvan (muriel@x-aeon.com)
@@ -95,14 +95,14 @@ then
   \# Set the environment correctly to execute Ruby from the extracted dir
   export LD_LIBRARY_PATH=`pwd`/tempruby/bin:`pwd`/tempruby/lib:`pwd`/tempruby/lib/lib1:`pwd`/tempruby/lib/lib2:`pwd`/tempruby/lib/lib3:`pwd`/tempruby/lib/lib4:${LD_LIRARY_PATH}
   export RUBYOPT=
-  ./tempruby/bin/ruby -w #{iExecutableInfo[:StartupRBFile]}
+  ./tempruby/bin/ruby -w #{iExecutableInfo[:startup_rb_file]}
 else
   echo 'Ruby found on current platform. Use it directly.'
-  ruby -w #{iExecutableInfo[:StartupRBFile]}
+  ruby -w #{iExecutableInfo[:startup_rb_file]}
 fi
 "
         end
-        File.chmod(0755, "#{iReleaseDir}/#{iExecutableInfo[:ExeName]}")
+        File.chmod(0755, "#{iReleaseDir}/#{iExecutableInfo[:exe_name]}")
       end
 
       return rSuccess

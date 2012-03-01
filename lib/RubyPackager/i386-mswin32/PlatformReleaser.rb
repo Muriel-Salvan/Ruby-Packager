@@ -64,7 +64,7 @@ module RubyPackager
       lBinSubDir = "Launch/#{RUBY_PLATFORM}/bin"
       lRubyBaseBinName = nil
       lRubyLaunchCmd = nil
-      if (iExecutableInfo[:TerminalApplication])
+      if (iExecutableInfo[:terminal_application])
         lRubyBaseBinName = 'ruby'
         lRubyLaunchCmd = 'ruby'
       else
@@ -78,7 +78,7 @@ module RubyPackager
         FileUtils::mkdir_p(lBinDir)
         change_dir(lBinDir) do
           lCmd = nil
-          if (iExecutableInfo[:TerminalApplication])
+          if (iExecutableInfo[:terminal_application])
             lCmd = "allinoneruby.bat #{lBinName}"
           else
             lCmd = "allinoneruby.bat --rubyw #{lBinName}"
@@ -133,12 +133,12 @@ lCurrentDir = Dir.getwd
 if (system('#{lRubyBaseBinName} --version'))
   \# Launch directly
   puts \"Ruby found in environment. Using it directly.\"
-  lSuccess = RubyPackager::shellExecute(\"#{lRubyLaunchCmd} -w \\\"\#{lCurrentDir}/#{iExecutableInfo[:StartupRBFile]}\\\" \#{ARGV.join(' ')}\")
+  lSuccess = RubyPackager::shellExecute(\"#{lRubyLaunchCmd} -w \\\"\#{lCurrentDir}/#{iExecutableInfo[:startup_rb_file]}\\\" \#{ARGV.join(' ')}\")
 end
 if (!lSuccess)
   \# Use allinoneruby
   puts \"Ruby not found in environment. Using shipped Ruby.\"
-  lSuccess = RubyPackager::shellExecute(\"start \\\"Title\\\" \\\"\#{lCurrentDir}/#{lBinSubDir}/#{lBinName}\\\" \\\"\#{lCurrentDir}/#{iExecutableInfo[:StartupRBFile]}\\\" \#{ARGV.join(' ')}\")
+  lSuccess = RubyPackager::shellExecute(\"start \\\"Title\\\" \\\"\#{lCurrentDir}/#{lBinSubDir}/#{lBinName}\\\" \\\"\#{lCurrentDir}/#{iExecutableInfo[:startup_rb_file]}\\\" \#{ARGV.join(' ')}\")
   if (!lSuccess)
     puts 'Unable to execute the application. Please reinstall it.'
     puts 'Hit enter to quit.'
@@ -148,18 +148,18 @@ end
 "
         end
         change_dir(iReleaseDir) do
-          rSuccess = system("exerb.bat -o #{iExecutableInfo[:ExeName]}.exe #{lTempFileName}")
+          rSuccess = system("exerb.bat -o #{iExecutableInfo[:exe_name]}.exe #{lTempFileName}")
         end
         if (rSuccess)
           File.unlink(lTempFileName)
           # And set its icon
-          lEdiconCmd = "#{PLATFORM_DIR}/edicon/edicon.exe #{iReleaseDir}/#{iExecutableInfo[:ExeName]}.exe #{iRootDir}/#{iExecutableInfo[:IconName]}"
+          lEdiconCmd = "#{PLATFORM_DIR}/edicon/edicon.exe #{iReleaseDir}/#{iExecutableInfo[:exe_name]}.exe #{iRootDir}/#{iExecutableInfo[:icon_name]}"
           rSuccess = system(lEdiconCmd)
           if (!rSuccess)
             log_err "Error while executing \"#{lEdiconCmd}\""
           end
         else
-          log_err "Error while executing \"exerb.bat -o #{iExecutableInfo[:ExeName]}.exe #{lTempFileName}\""
+          log_err "Error while executing \"exerb.bat -o #{iExecutableInfo[:exe_name]}.exe #{lTempFileName}\""
         end
       end
 

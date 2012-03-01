@@ -66,7 +66,7 @@ module RubyPackager
     # * *iDistributors* (<em>list<String></em>): The list of distributors to ship installers to
     def initialize(iPluginsManager, iReleaseInfo, iRootDir, iReleaseBaseDir, iPlatformReleaseInfo, iReleaseVersion, iReleaseTags, iReleaseComment, iIncludeRuby, iIncludeTest, iGenerateRDoc, iInstallers, iDistributors)
       @PluginsManager, @ReleaseInfo, @RootDir, @ReleaseBaseDir, @PlatformReleaseInfo, @ReleaseVersion, @ReleaseTags, @ReleaseComment, @IncludeRuby, @IncludeTest, @GenerateRDoc, @Installers, @Distributors = iPluginsManager, iReleaseInfo, iRootDir, iReleaseBaseDir, iPlatformReleaseInfo, iReleaseVersion, iReleaseTags, iReleaseComment, iIncludeRuby, iIncludeTest, iGenerateRDoc, iInstallers, iDistributors
-      @GemName = "#{@ReleaseInfo.GemInfo[:GemName]}-#{@ReleaseVersion}.gem"
+      @GemName = "#{@ReleaseInfo.gem_info[:gem_name]}-#{@ReleaseVersion}.gem"
       # Compute the release directory name
       lStrOptions = 'Normal'
       if (@IncludeRuby)
@@ -104,11 +104,11 @@ module RubyPackager
             (!@ReleaseInfo.checkReadyForRelease(@RootDir)))
           rSuccess = false
         end
-        if (!@ReleaseInfo.ExecutablesInfo.empty?)
+        if (!@ReleaseInfo.executables_info.empty?)
           # Check first if there will be a need for binary compilation
           lBinaryCompilation = false
-          @ReleaseInfo.ExecutablesInfo.each do |iExecutableInfo|
-            if (iExecutableInfo[:ExeName] != nil)
+          @ReleaseInfo.executables_info.each do |iExecutableInfo|
+            if (iExecutableInfo[:exe_name] != nil)
               lBinaryCompilation = true
               break
             end
@@ -207,7 +207,7 @@ module RubyPackager
       rSuccess = true
 
       logOp('Copy core files') do
-        RubyPackager::copyFiles(@RootDir, @ReleaseDir, @ReleaseInfo.CoreFiles)
+        RubyPackager::copyFiles(@RootDir, @ReleaseDir, @ReleaseInfo.core_files)
         # Create the ReleaseVersion file
         lStrTags = nil
         if (@ReleaseTags.empty?)
@@ -222,14 +222,14 @@ module RubyPackager
 {
   :Version => '#{@ReleaseVersion}',
   #{lStrTags},
-  :DevStatus => '#{@ReleaseInfo.ProjectInfo[:DevStatus]}'
+  :dev_status => '#{@ReleaseInfo.project_info[:dev_status]}'
 }
 "
         end
       end
-      @ReleaseInfo.ExecutablesInfo.each do |iExecutableInfo|
-        if (iExecutableInfo[:ExeName] != nil)
-          logOp("Create binary #{iExecutableInfo[:ExeName]}") do
+      @ReleaseInfo.executables_info.each do |iExecutableInfo|
+        if (iExecutableInfo[:exe_name] != nil)
+          logOp("Create binary #{iExecutableInfo[:exe_name]}") do
             # TODO (crate): When crate will work correctly under Windows, use it here to pack everything
             # For now the executable creation is platform dependent
             rSuccess = @PlatformReleaseInfo.create_binary(@RootDir, @ReleaseDir, @IncludeRuby, iExecutableInfo)
@@ -238,11 +238,11 @@ module RubyPackager
       end
       if (rSuccess)
         logOp('Copy additional files') do
-          RubyPackager::copyFiles(@RootDir, @ReleaseDir, @ReleaseInfo.AdditionalFiles)
+          RubyPackager::copyFiles(@RootDir, @ReleaseDir, @ReleaseInfo.additional_files)
         end
         if (@IncludeTest)
           logOp('Copy test files') do
-            RubyPackager::copyFiles(@RootDir, @ReleaseDir, @ReleaseInfo.TestFiles)
+            RubyPackager::copyFiles(@RootDir, @ReleaseDir, @ReleaseInfo.test_files)
           end
         end
       end
@@ -258,21 +258,21 @@ module RubyPackager
       rSuccess = true
 
       logOp('Generating RDoc') do
-        $ProjectInfo = {
-          :Name => @ReleaseInfo.ProjectInfo[:Name],
+        $project_info = {
+          :Name => @ReleaseInfo.project_info[:name],
           :Version => @ReleaseVersion,
           :Tags => @ReleaseTags,
           :Date => Time.now,
-          :DevStatus => @ReleaseInfo.ProjectInfo[:DevStatus],
-          :Author => @ReleaseInfo.AuthorInfo[:Name],
-          :AuthorMail => @ReleaseInfo.AuthorInfo[:EMail],
-          :AuthorURL => @ReleaseInfo.AuthorInfo[:WebPageURL],
-          :HomepageURL => @ReleaseInfo.ProjectInfo[:WebPageURL],
-          :ImageURL => @ReleaseInfo.ProjectInfo[:ImageURL],
+          :dev_status => @ReleaseInfo.project_info[:dev_status],
+          :Author => @ReleaseInfo.author_info[:name],
+          :AuthorMail => @ReleaseInfo.author_info[:email],
+          :AuthorURL => @ReleaseInfo.author_info[:web_page_url],
+          :HomepageURL => @ReleaseInfo.project_info[:web_page_url],
+          :image_url => @ReleaseInfo.project_info[:image_url],
           # TODO: Do not hardcode SF anymore
-          :DownloadURL => "https://sourceforge.net/projects/#{@ReleaseInfo.SFInfo[:ProjectUnixName]}/files/#{@ReleaseVersion}/#{@GemName}/download",
-          :SVNBrowseURL => @ReleaseInfo.ProjectInfo[:SVNBrowseURL],
-          :FaviconURL => @ReleaseInfo.ProjectInfo[:FaviconURL],
+          :DownloadURL => "https://sourceforge.net/projects/#{@ReleaseInfo.sf_info[:project_unix_name]}/files/#{@ReleaseVersion}/#{@GemName}/download",
+          :browse_source_url => @ReleaseInfo.project_info[:browse_source_url],
+          :favicon_url => @ReleaseInfo.project_info[:favicon_url],
           # For the documentation, the Root dir is the Release dir as files have been copied there and the rdoc will be generated from there.
           :RootDir => @ReleaseDir
         }
@@ -285,7 +285,7 @@ module RubyPackager
         lRDocOptions = [
           '--line-numbers',
           '--tab-width=2',
-          "--title=#{@ReleaseInfo.ProjectInfo[:Name].gsub(/'/,'\\\\\'')} v#{@ReleaseVersion}",
+          "--title=#{@ReleaseInfo.project_info[:name].gsub(/'/,'\\\\\'')} v#{@ReleaseVersion}",
           '--hyperlink-all',
           '--charset=utf-8',
           '--exclude=.svn',
@@ -339,7 +339,7 @@ module RubyPackager
           oFile << "
 <html>
   <head>
-    <link rel=\"shortcut icon\" href=\"#{@ReleaseInfo.ProjectInfo[:FaviconURL]}%>\" />
+    <link rel=\"shortcut icon\" href=\"#{@ReleaseInfo.project_info[:favicon_url]}%>\" />
     <style type=\"text/css\">
       body {
         background: #fdfdfd;
@@ -389,21 +389,21 @@ module RubyPackager
     </style>
   </head>
   <body>
-    <a href=\"#{@ReleaseInfo.ProjectInfo[:WebPageURL]}\"><img src=\"#{@ReleaseInfo.ProjectInfo[:ImageURL]}\" align=\"right\" width=\"100px\"/></a>
-    <h1>Release Note for #{@ReleaseInfo.ProjectInfo[:Name]} - v. #{@ReleaseVersion}</h1>
-    <h2>Development status: <span class=\"Important\">#{@ReleaseInfo.ProjectInfo[:DevStatus]}</span></h2>
+    <a href=\"#{@ReleaseInfo.project_info[:web_page_url]}\"><img src=\"#{@ReleaseInfo.project_info[:image_url]}\" align=\"right\" width=\"100px\"/></a>
+    <h1>Release Note for #{@ReleaseInfo.project_info[:name]} - v. #{@ReleaseVersion}</h1>
+    <h2>Development status: <span class=\"Important\">#{@ReleaseInfo.project_info[:dev_status]}</span></h2>
 #{lStrWhatsNew}
     <h2>Detailed changes with previous version</h2>
 #{lLastChangesLines.join}
     <h2>Useful links</h2>
     <ul>
-      <li><a href=\"#{@ReleaseInfo.ProjectInfo[:WebPageURL]}\">Project web site</a></li>
-      <li><a href=\"https://sourceforge.net/projects/#{@ReleaseInfo.SFInfo[:ProjectUnixName]}/files/#{@ReleaseVersion}/#{@GemName}/download\">Download</a></li>
-      <li>Author: <a href=\"#{@ReleaseInfo.AuthorInfo[:WebPageURL]}\">#{@ReleaseInfo.AuthorInfo[:Name]}</a> (<a href=\"mailto://#{@ReleaseInfo.AuthorInfo[:EMail]}\">Contact</a>)</li>
-      <li><a href=\"#{@ReleaseInfo.ProjectInfo[:WebPageURL]}rdoc/#{@ReleaseVersion}\">Browse RDoc</a></li>
-      <li><a href=\"#{@ReleaseInfo.ProjectInfo[:SVNBrowseURL]}\">Browse SVN</a></li>
-      <li><a href=\"#{@ReleaseInfo.ProjectInfo[:SVNBrowseURL]}ChangeLog?view=markup\">View complete ChangeLog</a></li>
-      <li><a href=\"#{@ReleaseInfo.ProjectInfo[:SVNBrowseURL]}README?view=markup\">View README file</a></li>
+      <li><a href=\"#{@ReleaseInfo.project_info[:web_page_url]}\">Project web site</a></li>
+      <li><a href=\"https://sourceforge.net/projects/#{@ReleaseInfo.sf_info[:project_unix_name]}/files/#{@ReleaseVersion}/#{@GemName}/download\">Download</a></li>
+      <li>Author: <a href=\"#{@ReleaseInfo.author_info[:web_page_url]}\">#{@ReleaseInfo.author_info[:name]}</a> (<a href=\"mailto://#{@ReleaseInfo.author_info[:email]}\">Contact</a>)</li>
+      <li><a href=\"#{@ReleaseInfo.project_info[:web_page_url]}rdoc/#{@ReleaseVersion}\">Browse RDoc</a></li>
+      <li><a href=\"#{@ReleaseInfo.project_info[:browse_source_url]}\">Browse source</a></li>
+      <li><a href=\"#{@ReleaseInfo.project_info[:browse_source_url]}ChangeLog?view=markup\">View complete ChangeLog</a></li>
+      <li><a href=\"#{@ReleaseInfo.project_info[:browse_source_url]}README?view=markup\">View README file</a></li>
     </ul>
   </body>
 </html>
@@ -433,9 +433,9 @@ module RubyPackager
         end
         File.open("#{@DocDir}/ReleaseNote.txt", 'w') do |oFile|
           oFile << "
-= Release Note for #{@ReleaseInfo.ProjectInfo[:Name]} - v. #{@ReleaseVersion}
+= Release Note for #{@ReleaseInfo.project_info[:name]} - v. #{@ReleaseVersion}
 
-== Development status: #{@ReleaseInfo.ProjectInfo[:DevStatus]}
+== Development status: #{@ReleaseInfo.project_info[:dev_status]}
 
 #{lStrWhatsNew}
 == Detailed changes with previous version
@@ -444,13 +444,13 @@ module RubyPackager
 
 ==  Useful links
 
-* Project web site: #{@ReleaseInfo.ProjectInfo[:WebPageURL]}
-* Download: https://sourceforge.net/projects/#{@ReleaseInfo.ProjectInfo[:ProjectUnixName]}/files/#{@ReleaseVersion}/#{@GemName}/download
-* Author: #{@ReleaseInfo.AuthorInfo[:Name]} (#{@ReleaseInfo.AuthorInfo[:WebPageURL]}) (Mail: #{@ReleaseInfo.AuthorInfo[:EMail]})
-* Browse RDoc: #{@ReleaseInfo.ProjectInfo[:WebPageURL]}rdoc/#{@ReleaseVersion}
-* Browse SVN: #{@ReleaseInfo.ProjectInfo[:SVNBrowseURL]}
-* View complete ChangeLog: #{@ReleaseInfo.ProjectInfo[:SVNBrowseURL]}ChangeLog?view=markup
-* View README file: #{@ReleaseInfo.ProjectInfo[:SVNBrowseURL]}README?view=markup
+* Project web site: #{@ReleaseInfo.project_info[:web_page_url]}
+* Download: https://sourceforge.net/projects/#{@ReleaseInfo.project_info[:project_unix_name]}/files/#{@ReleaseVersion}/#{@GemName}/download
+* Author: #{@ReleaseInfo.author_info[:name]} (#{@ReleaseInfo.author_info[:web_page_url]}) (Mail: #{@ReleaseInfo.author_info[:email]})
+* Browse RDoc: #{@ReleaseInfo.project_info[:web_page_url]}rdoc/#{@ReleaseVersion}
+* Browse source: #{@ReleaseInfo.project_info[:browse_source_url]}
+* View complete ChangeLog: #{@ReleaseInfo.project_info[:browse_source_url]}ChangeLog?view=markup
+* View README file: #{@ReleaseInfo.project_info[:browse_source_url]}README?view=markup
 "
         end
       end
