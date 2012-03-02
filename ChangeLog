@@ -1,5 +1,15 @@
 = RubyPackager Release History
 
+== 1.2.0.20120302 (Beta)
+
+* Adapted release information to last version of RubyPackager
+* Adapted release information to last version of rUtilAnts
+* Removed rdoc warning in documentation
+* Updated Copyright information
+* Updated email address of Muriel Salvan
+* Adapted comments to match a better RDoc syntax
+* Adapted to new version of rUtilAnts
+
 == 1.1.0.20120301 (Beta)
 
 This release changes the API from 1.0.0 (no more camelcase for some methods and parameters, notably generated ReleaseInfo files)

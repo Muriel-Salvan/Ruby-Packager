@@ -24,21 +24,25 @@ module RubyPackager
         rFileName = nil
 
         change_dir(iReleaseDir) do
+
           # 1. Generate the gemspec that will build the gem
-          lStrHasRDoc = nil
-          if (iReleaseInfo.gem_info[:has_rdoc])
-            lStrHasRDoc = 'true'
-          else
-            lStrHasRDoc = 'false'
-          end
+
+          # has_rdoc
+          lStrHasRDoc = (iReleaseInfo.gem_info[:has_rdoc]) ? 'true' : 'false'
+
+          # files
           # !!! Don't use absolute paths here, otherwise they will be stored in the Gem
           lStrFiles = "iSpec.files = [ '#{Dir.glob('**/*').join('\', \'')}' ]"
+
+          # extra_rdoc_files
           lStrExtraRDocFiles = ''
           if ((iReleaseInfo.gem_info[:extra_rdoc_files] != nil) and
               (!iReleaseInfo.gem_info[:extra_rdoc_files].empty?))
             lStrExtraRDocFiles = "iSpec.extra_rdoc_files = [ '#{iReleaseInfo.gem_info[:extra_rdoc_files].join('\', \'')}' ]"
             RubyPackager::copyFiles(iRootDir, iReleaseDir, iReleaseInfo.gem_info[:extra_rdoc_files])
           end
+
+          # add_dependency
           lGemDepsStrList = []
           if (iReleaseInfo.gem_info[:gem_dependencies] != nil)
             iReleaseInfo.gem_info[:gem_dependencies].each do |iGemDepInfo|
@@ -50,11 +54,15 @@ module RubyPackager
               end
             end
           end
+
+          # test_file
           lStrTestFile = ''
           if ((iIncludeTest) and
               (iReleaseInfo.gem_info[:test_file] != nil))
             lStrTestFile = "iSpec.test_file = '#{iReleaseInfo.gem_info[:test_file]}'"
           end
+
+          # bind_dir and executables
           # Compute the list of executable files and the executable directory
           lBinError = false
           lExecutablesDir = nil
@@ -76,6 +84,8 @@ module RubyPackager
               lStrBinDir = "iSpec.bindir = '#{lExecutablesDir}'"
               lStrExecutables = "iSpec.executables = #{lExecutablesBase.inspect}"
             end
+
+            # require_path and require_paths
             # Compute require paths
             lRequirePaths = []
             if (iReleaseInfo.gem_info[:require_path] != nil)
@@ -84,10 +94,16 @@ module RubyPackager
             if (iReleaseInfo.gem_info[:require_paths] != nil)
               lRequirePaths.concat(iReleaseInfo.gem_info[:require_paths])
             end
-            lStrRequirePaths = 'iSpec.require_path = \'\''
-            if (!lRequirePaths.empty?)
-              lStrRequirePaths = "iSpec.require_paths = #{lRequirePaths.inspect}"
+            lStrRequirePaths = (lRequirePaths.empty?) ? 'iSpec.require_path = \'\'' : "iSpec.require_paths = #{lRequirePaths.inspect}"
+            
+            # extensions
+            lStrExtensions = ''
+            if ((iReleaseInfo.gem_info[:extensions] != nil) and
+                (!iReleaseInfo.gem_info[:extensions].empty?))
+              lStrExtensions = "iSpec.extensions = [ '#{iReleaseInfo.gem_info[:extensions].join('\', \'')}' ]"
             end
+
+            # Generate the GemSpec file
             lGemSpecFileName = 'release.gemspec.rb'
             File.open(lGemSpecFileName, 'w') do |oFile|
               oFile << "
@@ -109,9 +125,11 @@ Gem::Specification.new do |iSpec|
   #{lStrBinDir}
   #{lStrExecutables}
   #{lGemDepsStrList.join("\n")}
+  #{lStrExtensions}
 end
 "
             end
+
             # 2. Call gem build with this gemspec
             # Load RubyGems
             require 'rubygems/command_manager'
@@ -138,6 +156,7 @@ end
                 FileUtils::mv(rFileName, "#{iInstallerDir}/#{rFileName}")
               end
             end
+
           end
         end
 
