@@ -172,6 +172,7 @@ module RubyPackager
     #   * *:extra_rdoc_files* (<em>list<String></em>): List of file patterns to be included in the RDoc but not in the Gem
     #   * *:test_file* (_String_): Name of the test file to execute
     #   * *:gem_dependencies* (<em>list< [String,String] ></em>): List of [ Gem, Version criteria ] this Gem depends on
+    #   * *:extensions* (<em>list<String></em>): List of paths to extconf.rb files to include as native C extensions
     # Return::
     # * _ReleaseInfo_: self
     def gem(iParams)
