@@ -194,7 +194,7 @@ module RubyPackager
             lIncludeRuby,
             lIncludeTest,
             lIncludeRDoc,
-            lInstallers,
+            lInstallers.sort,
             lDistributors
           ).execute
           if (rSuccess)
