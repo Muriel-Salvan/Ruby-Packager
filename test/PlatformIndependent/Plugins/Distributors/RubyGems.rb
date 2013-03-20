@@ -23,11 +23,11 @@ module RubyPackager
                 [ 'system', {
                   :Cmd => 'gem push --help',
                   :Dir => /^.*$/
-                } ],
+                }, { :Execute => true } ],
                 [ 'system', {
                   :Cmd => 'gem push GemName-0.0.1.20120228.gem',
                   :Dir => /^.*\/#{lReleaseBaseDir}\/Installer$/
-                } ]
+                }, { :Execute => Proc.new { true } } ]
               ]) do |iReleaseDir, iReleaseInfo|
                 checkReleaseInfo(iReleaseDir, iReleaseInfo, :version => '0.0.1.20120228')
                 checkReleaseNotes(iReleaseDir, iReleaseInfo)

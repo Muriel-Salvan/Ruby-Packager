@@ -81,7 +81,8 @@ module RubyPackager
 
 \# Test Ruby's existence
 which ruby >/dev/null 2>/dev/null
-if [ $? == 1 ]
+OUT=$?
+if [ $OUT -eq 1 ]
 then
   echo 'Ruby not found on current platform. Use embedded one.'
   if [ ! -d tempruby ]

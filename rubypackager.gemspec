@@ -7,4 +7,7 @@ Gem::Specification.new do |s|
   s.add_dependency('rUtilAnts', '>= 1.0')
   s.add_dependency('allinoneruby')
   s.add_dependency('highline')
+  s.add_dependency('net-ssh')
+  s.add_dependency('net-scp')
+  s.add_dependency('rdoc')
 end

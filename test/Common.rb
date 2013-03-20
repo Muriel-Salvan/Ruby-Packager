@@ -397,16 +397,9 @@ module RubyPackager
 
         change_dir(File.dirname(lExeFileName)) do
           begin
-            # TODO: Bug ???: On Linux, we need to "cd ." before, otherwise the executable is not found. Understand why and remove it.
-            # TODO: Remove this code once we now what is the problem
-            require 'rUtilAnts/Platform'
-            RUtilAnts::Platform::install_platform_on_object
-            if (os == RUtilAnts::Platform::OS_LINUX)
-              rOutput = backquote_RBTest("cd .;#{File.basename(lExeFileName)}")
-            else
-              rOutput = backquote_RBTest(File.basename(lExeFileName))
-            end
+             rOutput = backquote_RBTest("./#{File.basename(lExeFileName)}")
           rescue Exception
+            log_err "Exception during executable run \"#{lExeFileName}\": #{$!}\n#{$!.backtrace.join("\n")}"
             assert(false)
           end
         end

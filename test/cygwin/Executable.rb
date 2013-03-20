@@ -51,10 +51,10 @@ Hello World\n", runExe(lExeFileName))
           execTest('Applications/Basic', [ '-r' ], 'ReleaseInfo_Exe.rb', :ExpectCalls => [
             [ 'system',
               {
-                :Dir => /^.*\/#{lReleaseBaseDir}\/Release\/Launch\/i386\-cygwin\/bin$/,
+                :Dir => /^.*\/#{lReleaseBaseDir}\/Release\/Launch\/cygwin\/bin$/,
                 :Cmd => /^allinoneruby ruby\-\d\.\d\.\d\.bin$/
               },
-              { :Execute => true }
+              { :Execute => $RBPTest_ExternalTools ? true : Proc.new { true } }
             ]
           ]) do |iReleaseDir, iReleaseInfo|
             checkReleaseInfo(iReleaseDir, iReleaseInfo)
@@ -76,10 +76,10 @@ Hello World\n", runExe(lExeFileName))
           execTest('Applications/Basic', [ '-r' ], 'ReleaseInfo_ExeTerm.rb', :ExpectCalls => [
             [ 'system',
               {
-                :Dir => /^.*\/#{lReleaseBaseDir}\/Release\/Launch\/i386\-cygwin\/bin$/,
+                :Dir => /^.*\/#{lReleaseBaseDir}\/Release\/Launch\/cygwin\/bin$/,
                 :Cmd => /^allinoneruby ruby\-\d\.\d\.\d\.bin$/
               },
-              { :Execute => true }
+              { :Execute => $RBPTest_ExternalTools ? true : Proc.new { true } }
             ]
           ]) do |iReleaseDir, iReleaseInfo|
             checkReleaseInfo(iReleaseDir, iReleaseInfo)

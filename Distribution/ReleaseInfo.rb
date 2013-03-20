@@ -41,7 +41,10 @@ RubyPackager::ReleaseInfo.new.
     :gem_dependencies => [
       [ 'rUtilAnts', '>= 1.0' ],
       'allinoneruby',
-      'highline'
+      'highline',
+      'net-ssh',
+      'net-scp',
+      'rdoc'
     ]
   ).
   source_forge(

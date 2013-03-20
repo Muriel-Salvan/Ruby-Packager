@@ -47,7 +47,15 @@ Hello World\n", runExe(lExeFileName))
 
         # Test the basic usage generating an executable, including Ruby
         def testBasicBinaryWithRuby
-          execTest('Applications/Basic', [ '-r' ], 'ReleaseInfo_Exe.rb') do |iReleaseDir, iReleaseInfo|
+          execTest('Applications/Basic', [ '-r' ], 'ReleaseInfo_Exe.rb', :ExpectCalls => [
+            [ 'system',
+              {
+                :Dir => /^.*\/Releases\/#{RUBY_PLATFORM}\/UnnamedVersion\/IncludeRuby\/\d\d\d\d_\d\d_\d\d_\d\d_\d\d_\d\d\/Release\/Launch\/linux\/bin$/,
+                :Cmd => /^allinoneruby ruby\-#{RUBY_VERSION}\.bin$/
+              },
+              { :Execute => $RBPTest_ExternalTools ? true : Proc.new { true } }
+            ]
+          ]) do |iReleaseDir, iReleaseInfo|
             checkReleaseInfo(iReleaseDir, iReleaseInfo)
             checkReleaseNotes(iReleaseDir, iReleaseInfo)
             lExeFileName = "#{iReleaseDir}/Release/ExeName"
@@ -63,7 +71,15 @@ Hello World\n", runExe(lExeFileName))
 
         # Test the basic usage generating an executable, including Ruby launched from a terminal
         def testBasicBinaryWithRubyInTerminal
-          execTest('Applications/Basic', [ '-r' ], 'ReleaseInfo_ExeTerm.rb') do |iReleaseDir, iReleaseInfo|
+          execTest('Applications/Basic', [ '-r' ], 'ReleaseInfo_ExeTerm.rb', :ExpectCalls => [
+            [ 'system',
+              {
+                :Dir => /^.*\/Releases\/#{RUBY_PLATFORM}\/UnnamedVersion\/IncludeRuby\/\d\d\d\d_\d\d_\d\d_\d\d_\d\d_\d\d\/Release\/Launch\/linux\/bin$/,
+                :Cmd => /^allinoneruby ruby\-#{RUBY_VERSION}\.bin$/
+              },
+              { :Execute => $RBPTest_ExternalTools ? true : Proc.new { true } }
+            ]
+          ]) do |iReleaseDir, iReleaseInfo|
             checkReleaseInfo(iReleaseDir, iReleaseInfo)
             checkReleaseNotes(iReleaseDir, iReleaseInfo)
             lExeFileName = "#{iReleaseDir}/Release/ExeName"

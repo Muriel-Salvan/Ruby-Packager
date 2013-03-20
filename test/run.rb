@@ -8,7 +8,7 @@
 require 'test/unit'
 
 # Set to true to activate log debugs
-$RBPTest_Debug = false
+$RBPTest_Debug = true
 
 # Set to true to test using external tools (NSIS, exerb)
 $RBPTest_ExternalTools = false
@@ -30,7 +30,7 @@ PLATFORM_ID = (
   case os
   when RUtilAnts::Platform::OS_WINDOWS
     'windows'
-  when RUtilAnts::Platform::OS_LINUX, RUtilAnts::Platform::OS_UNIX, RUtilAnts::Platform::OS_MACOSX
+  when RUtilAnts::Platform::OS_LINUX, RUtilAnts::Platform::OS_MACOSX
     'linux'
   when RUtilAnts::Platform::OS_CYGWIN
     'cygwin'

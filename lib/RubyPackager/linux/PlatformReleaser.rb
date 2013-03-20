@@ -67,7 +67,8 @@ module RubyPackager
       if (rSuccess)
         # Then create the real executable
         # Generate the Shell file that launches everything for Linux
-        File.open("#{iReleaseDir}/#{iExecutableInfo[:exe_name]}", 'w') do |oFile|
+        lShellFileName = "#{iReleaseDir}/#{iExecutableInfo[:exe_name]}"
+        File.open(lShellFileName, 'w') do |oFile|
           oFile << "\#!/bin/sh
 \#--
 \# Copyright (c) 2009 - 2012 Muriel Salvan (muriel@x-aeon.com)
@@ -81,7 +82,8 @@ module RubyPackager
 
 \# Test Ruby's existence
 which ruby >/dev/null 2>/dev/null
-if [ $? == 1 ]
+OUT=$?
+if [ $OUT -eq 1 ]
 then
   echo 'Ruby not found on current platform. Use embedded one.'
   if [ ! -d tempruby ]
@@ -102,7 +104,7 @@ else
 fi
 "
         end
-        File.chmod(0755, "#{iReleaseDir}/#{iExecutableInfo[:exe_name]}")
+        File.chmod(0755, lShellFileName)
       end
 
       return rSuccess
