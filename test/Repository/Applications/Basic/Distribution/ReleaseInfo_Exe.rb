@@ -25,9 +25,9 @@ RubyPackager::ReleaseInfo.new.
   executable(
     :startup_rb_file => 'Main.rb',
     :exe_name => 'ExeName',
-    :icon_name => "Distribution/#{RUBY_PLATFORM}/Icon.ico",
+    :icon_name => "Distribution/#{PLATFORM_ID}/Icon.ico",
     :terminal_application => false
   ).
   install(
-    :nsis_file_name => "Distribution/#{RUBY_PLATFORM}/Installer/install.nsi"
+    :nsis_file_name => "Distribution/#{PLATFORM_ID}/Installer/install.nsi"
   )

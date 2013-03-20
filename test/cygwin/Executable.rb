@@ -7,12 +7,12 @@ module RubyPackager
 
   module Test
 
-    module I386Cygwin
+    module Cygwin
 
       class Executable < ::Test::Unit::TestCase
 
         include RubyPackager::Test::Common
-        
+
         # Test the basic usage generating an executable
         def testBasicBinary
           execTest('Applications/Basic', [], 'ReleaseInfo_Exe.rb') do |iReleaseDir, iReleaseInfo|

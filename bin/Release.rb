@@ -15,8 +15,23 @@ require 'rUtilAnts/Logging'
 RUtilAnts::Logging::install_logger_on_object(:lib_root_dir => "#{File.dirname(__FILE__)}/..", :bug_tracker_url => 'http://sourceforge.net/tracker/?group_id=274236&atid=1165400')
 require 'rUtilAnts/Misc'
 RUtilAnts::Misc.install_misc_on_object
+require 'rUtilAnts/Platform'
+RUtilAnts::Platform.install_platform_on_object
 
 module RubyPackager
+
+  PLATFORM_ID = (
+    case os
+    when RUtilAnts::Platform::OS_WINDOWS
+      'windows'
+    when RUtilAnts::Platform::OS_LINUX, RUtilAnts::Platform::OS_UNIX, RUtilAnts::Platform::OS_MACOSX
+      'linux'
+    when RUtilAnts::Platform::OS_CYGWIN
+      'cygwin'
+    else
+      raise RuntimeError, "Non supported OS code: #{os}"
+    end
+  )
 
   # Class giving command line options for the releaser
   class Launcher
@@ -49,9 +64,9 @@ module RubyPackager
       require 'rUtilAnts/Plugins'
       lPluginsManager = RUtilAnts::Plugins::PluginsManager.new
       lPluginsManager.parse_plugins_from_dir('Installers', "#{File.dirname(FILE_PATH)}/../lib/RubyPackager/Installers", 'RubyPackager::Installers')
-      lPluginsManager.parse_plugins_from_dir('Installers', "#{File.dirname(FILE_PATH)}/../lib/RubyPackager/#{RUBY_PLATFORM}/Installers", 'RubyPackager::Installers')
+      lPluginsManager.parse_plugins_from_dir('Installers', "#{File.dirname(FILE_PATH)}/../lib/RubyPackager/#{PLATFORM_ID}/Installers", 'RubyPackager::Installers')
       lPluginsManager.parse_plugins_from_dir('Distributors', "#{File.dirname(FILE_PATH)}/../lib/RubyPackager/Distributors", 'RubyPackager::Distributors')
-      lPluginsManager.parse_plugins_from_dir('Distributors', "#{File.dirname(FILE_PATH)}/../lib/RubyPackager/#{RUBY_PLATFORM}/Distributors", 'RubyPackager::Distributors')
+      lPluginsManager.parse_plugins_from_dir('Distributors', "#{File.dirname(FILE_PATH)}/../lib/RubyPackager/#{PLATFORM_ID}/Distributors", 'RubyPackager::Distributors')
 
       # Parse command line arguments
       # Variables set by the parser
@@ -166,7 +181,7 @@ module RubyPackager
           # All is ok, call the library with parameters
           require 'RubyPackager/Releaser'
           # Require the platform specific distribution file
-          require "RubyPackager/#{RUBY_PLATFORM}/PlatformReleaser"
+          require "RubyPackager/#{PLATFORM_ID}/PlatformReleaser"
           rSuccess = Releaser.new(
             lPluginsManager,
             lReleaseInfo,

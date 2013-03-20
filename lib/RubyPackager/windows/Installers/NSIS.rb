@@ -33,9 +33,10 @@ module RubyPackager
       # * *iInstallerDir* (_String_): The directory where the installer has to be put
       # * *iVersion* (_String_): Release version
       # * *iReleaseInfo* (_ReleaseInfo_): Release info
+      # * *iIncludeTest* (_Boolean_): Are test files part of the release ?
       # Return::
       # * _String_: File name to distribute, or nil in case of failure
-      def create_installer(iRootDir, iReleaseDir, iInstallerDir, iVersion, iReleaseInfo)
+      def create_installer(iRootDir, iReleaseDir, iInstallerDir, iVersion, iReleaseInfo, iIncludeTest)
         rFileName = nil
 
         if (iReleaseInfo.install_info[:nsis_file_name] == nil)

@@ -75,9 +75,11 @@ class Object
     raise "Expecting call:\n#{lExpectedCall[0..1].inspect}\nbut received call\n#{[iCallType, iCallParams].inspect}\n." if !lMatchOK
     # Analyze the behaviour to have
     lBehaviourParams = lExpectedCall[2] || {}
-    if (lBehaviourParams[:Execute] and
+    if ((lBehaviourParams[:Execute] == true) and
         block_given?)
       yield
+    elsif (lBehaviourParams[:Execute].is_a?(Proc))
+      lBehaviourParams[:Execute].call
     end
   end
 
@@ -435,7 +437,7 @@ module RubyPackager
 
         return rGemSpec
       end
-      
+
     end
 
   end
