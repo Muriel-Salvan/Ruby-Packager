@@ -8,7 +8,7 @@
 require 'test/unit'
 
 # Set to true to activate log debugs
-$RBPTest_Debug = true
+$RBPTest_Debug = false
 
 # Set to true to test using external tools (NSIS, exerb)
 $RBPTest_ExternalTools = false

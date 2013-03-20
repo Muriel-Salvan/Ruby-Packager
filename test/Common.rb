@@ -285,7 +285,7 @@ module RubyPackager
       def setup_repository(iRepositoryName)
         lAppDir = File.expand_path("#{File.dirname(__FILE__)}/Repository/#{iRepositoryName}")
         @@IdxRepo = 0 if (defined?(@@IdxRepo) == nil)
-        lRepositoryDir = "#{Dir.tmpdir}/RBPTest/Repository_#{@@IdxRepo}"
+        lRepositoryDir = "#{Dir.tmpdir}/RBPTest/Repository_#{Process.pid}_#{@@IdxRepo}"
         @@IdxRepo += 1
         FileUtils::rm_rf(lRepositoryDir) if (File.exists?(lRepositoryDir))
         FileUtils::mkdir_p(lRepositoryDir)
