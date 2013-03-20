@@ -161,7 +161,7 @@ module RubyPackager
         def create_installer(iRootDir, iReleaseDir, iInstallerDir, iVersion, iReleaseInfo, iIncludeTest)
           rFileName = nil
 
-          Dir.glob("#{iReleaseDir}/*").each do |iFileName|
+          Dir.glob("#{iReleaseDir}/*").sort.each do |iFileName|
             rFileName = "#{File.basename(iFileName)}.Installer1"
             require 'fileutils'
             FileUtils::cp(iFileName, "#{iInstallerDir}/#{rFileName}")
@@ -189,7 +189,7 @@ module RubyPackager
         def create_installer(iRootDir, iReleaseDir, iInstallerDir, iVersion, iReleaseInfo, iIncludeTest)
           rFileName = nil
 
-          Dir.glob("#{iReleaseDir}/*").each do |iFileName|
+          Dir.glob("#{iReleaseDir}/*").sort.each do |iFileName|
             rFileName = "#{File.basename(iFileName)}.Installer2"
             require 'fileutils'
             FileUtils::cp(iFileName, "#{iInstallerDir}/#{rFileName}")
