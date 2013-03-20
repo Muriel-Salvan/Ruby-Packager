@@ -1,0 +1,22 @@
+PATH
+  remote: .
+  specs:
+    RubyPackager (0.0.1)
+      allinoneruby
+      highline
+      rUtilAnts (>= 1.0)
+
+GEM
+  remote: http://rubygems.org/
+  specs:
+    allinoneruby (0.2.11)
+    highline (1.6.16)
+    rUtilAnts (1.0.1.20130320)
+    rake (10.0.3)
+
+PLATFORMS
+  x86-mingw32
+
+DEPENDENCIES
+  RubyPackager!
+  rake
