@@ -1,8 +1,3 @@
-#--
-# Copyright (c) 2009 - 2012 Muriel Salvan (muriel@x-aeon.com)
-# Licensed under the terms specified in LICENSE file. No warranty is provided.
-#++
-
 module RubyPackager
 
   module Installers
@@ -95,7 +90,7 @@ module RubyPackager
               lRequirePaths.concat(iReleaseInfo.gem_info[:require_paths])
             end
             lStrRequirePaths = (lRequirePaths.empty?) ? 'iSpec.require_path = \'\'' : "iSpec.require_paths = #{lRequirePaths.inspect}"
-            
+
             # extensions
             lStrExtensions = ''
             if ((iReleaseInfo.gem_info[:extensions] != nil) and

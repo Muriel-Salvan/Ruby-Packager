@@ -1,8 +1,4 @@
 # coding: utf-8
-#--
-# Copyright (c) 2009 - 2012 Muriel Salvan (muriel@x-aeon.com)
-# Licensed under the terms specified in LICENSE file. No warranty is provided.
-#++
 
 # Release a distribution of a Ruby program.
 # This produces an installable executable that will install a set of files and directories:

@@ -1,8 +1,3 @@
-#--
-# Copyright (c) 2009 - 2012 Muriel Salvan (muriel@x-aeon.com)
-# Licensed under the terms specified in LICENSE file. No warranty is provided.
-#++
-
 # This file prepares a win32 distribution
 
 # Require needed to generate the temporary ruby file that produces the executable
