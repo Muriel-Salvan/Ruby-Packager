@@ -1,5 +1,17 @@
 = RubyPackager Release History
 
+== 1.2.1.20131211 (Beta)
+
+* Changed the way to test for exerb.
+* Removed useless copyrights
+* Sorted file names in test stubs for determinism
+* Sort installers to avoid problems with testing
+* Setup unique repository names for parallel execution on Travis
+* Made tests pass on Windows, Cygwin and Linux
+* Adapted code and tests for all platforms
+* Added support for Travis
+* Added missing comment
+
 == 1.2.0.20120302 (Beta)
 
 * Adapted release information to last version of RubyPackager
