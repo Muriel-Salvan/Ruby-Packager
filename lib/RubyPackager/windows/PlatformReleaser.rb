@@ -34,7 +34,7 @@ module RubyPackager
           rSuccess = false
         end
         # Check that exerb is present
-        if (!system('exerb.bat --version'))
+        if (system('exerb.bat --version') == nil)
           log_err "Need to have exerb installed in the system PATH to create a Windows executable.\nPlease download and install exerb from http://exerb.sourceforge.jp/index.en.html"
           rSuccess = false
         end
